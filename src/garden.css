@@ -43,7 +43,10 @@
   --petal-3: oklch(0.68 0.17 var(--bh));
   --petal-hi: oklch(0.975 0.02 var(--bh));
   --trunk: #8b5e4a; --soil: #b08a70; --leaf: #86c493; --leaf-2: #5faa74;
-  --hill: oklch(0.92 0.06 150); --sky-top: oklch(0.955 0.03 var(--h5));
+  --hill: oklch(0.92 0.06 150); --hill-deep: oklch(0.865 0.072 150); --sky-top: oklch(0.955 0.03 var(--h5));
+  --glass: oklch(0.997 0.006 var(--bh) / 0.78);
+  --glass-border: oklch(0.86 0.06 var(--bh) / 0.72);
+  --glass-shadow: 0 6px 16px -10px oklch(0.5 0.14 var(--bh) / 0.34);
   --glow-c: oklch(0.86 0.1 var(--bh) / 0.45);
   --primary-hover: brightness(1.1);
   --shadow-card: 0 1px 2px oklch(0.5 0.1 var(--bh) / 0.06), 0 14px 30px -16px oklch(0.5 0.15 var(--bh) / 0.28);
@@ -69,7 +72,10 @@
   --petal-3: oklch(0.64 0.17 var(--bh));
   --petal-hi: oklch(0.95 0.03 var(--bh));
   --trunk: #a37866; --soil: #7b5c4b; --leaf: #7fc391; --leaf-2: #58a06d;
-  --hill: oklch(0.34 0.06 150); --sky-top: oklch(0.27 0.05 var(--h5));
+  --hill: oklch(0.34 0.06 150); --hill-deep: oklch(0.275 0.065 150); --sky-top: oklch(0.27 0.05 var(--h5));
+  --glass: oklch(0.235 0.032 var(--bh) / 0.78);
+  --glass-border: oklch(0.42 0.06 var(--bh) / 0.55);
+  --glass-shadow: 0 8px 18px -12px rgb(0 0 0 / 0.65);
   --glow-c: oklch(0.6 0.15 var(--bh) / 0.22);
   --primary-hover: brightness(0.92);
   --shadow-card: 0 1px 2px rgb(0 0 0 / 0.3), 0 10px 28px -14px rgb(0 0 0 / 0.6);
@@ -95,7 +101,10 @@
   --petal-3: oklch(0.54 0.15 var(--bh));
   --petal-hi: oklch(0.85 0.03 var(--bh));
   --trunk: #7d5a4b; --soil: #5a4337; --leaf: #5f9a70; --leaf-2: #457c57;
-  --hill: oklch(0.2 0.04 150); --sky-top: oklch(0.13 0.03 var(--h5));
+  --hill: oklch(0.2 0.04 150); --hill-deep: oklch(0.145 0.04 150); --sky-top: oklch(0.13 0.03 var(--h5));
+  --glass: oklch(0.125 0.018 var(--bh) / 0.84);
+  --glass-border: oklch(0.3 0.045 var(--bh) / 0.55);
+  --glass-shadow: none;
   --glow-c: transparent;
   --primary-hover: brightness(0.92);
   --shadow-card: none;
@@ -119,11 +128,34 @@
 :root[data-style="garden"] .wkfoot { border-radius: 0 0 16px 16px; }
 
 .garden-banner { background: var(--bloom); color: var(--on-bloom); }
-.garden-scene { background: linear-gradient(to bottom, var(--sky-top), var(--surface)); }
-.garden-hill {
-  position: absolute; left: -15%; right: -15%; bottom: -52px; height: 104px;
-  border-radius: 50%; background: var(--hill);
+.garden-scene { background: linear-gradient(to bottom, var(--sky-top), var(--surface) 64%); }
+.garden-meadow { background: linear-gradient(to bottom, var(--hill) 0%, var(--hill-deep) 100%); }
+.garden-pill {
+  background: var(--glass);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  transition: transform 0.25s cubic-bezier(0.3, 1.5, 0.5, 1), border-color 0.2s;
 }
+.garden-pill:hover { transform: translateY(-2px); border-color: var(--bloom); }
+.garden-chip {
+  background: linear-gradient(135deg, var(--surface) 0%, var(--surface-2) 100%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  transition: transform 0.25s cubic-bezier(0.3, 1.5, 0.5, 1), border-color 0.2s;
+}
+.garden-chip:hover { transform: translateY(-2px); border-color: var(--bloom); }
+.bloom-flower { transition: transform 0.3s cubic-bezier(0.3, 1.7, 0.5, 1); }
+.garden-pill:hover .bloom-flower { transform: scale(1.18) translateY(-1px); }
+.garden-chip:hover .bloom-flower { transform: scale(1.16) rotate(4deg); }
+
+.bloom-sway { animation: bloomSway 3.8s ease-in-out infinite; }
+.bloom-sway-alt { animation: bloomSway 4.5s ease-in-out infinite reverse; }
+@keyframes bloomSway { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(4deg); } }
+.bloom-breathe { animation: bloomBreathe 3.2s ease-in-out infinite; }
+@keyframes bloomBreathe { 0%, 100% { transform: scale(0.94); } 50% { transform: scale(1.07); } }
+.bloom-spin { animation: spin 18s linear infinite; }
 
 /* ---------- plants ---------- */
 .plant { display: block; overflow: visible; }
@@ -159,15 +191,46 @@
 @keyframes petalOpen { from { transform: scale(0); } }
 
 .petal-fall {
+  --pa: 0.95;
   position: absolute; top: -14px; width: 10px; height: 7px; border-radius: 80% 0 80% 0;
   background: var(--petal-2); opacity: 0; pointer-events: none;
   animation: petalFall calc(5s + var(--i) * 0.45s) linear infinite; animation-delay: calc(var(--i) * -0.9s);
 }
+.petal-fall.is-subtle { --pa: 0.5; }
 .petal-fall:nth-child(odd) { background: var(--petal-1); width: 8px; height: 6px; }
 @keyframes petalFall {
   0% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
-  10% { opacity: 0.95; }
-  50% { transform: translate(26px, 125px) rotate(200deg); }
-  90% { opacity: 0.9; }
-  100% { transform: translate(-12px, 250px) rotate(420deg); opacity: 0; }
+  10% { opacity: var(--pa); }
+  50% { transform: translate(26px, 195px) rotate(200deg); }
+  90% { opacity: calc(var(--pa) * 0.9); }
+  100% { transform: translate(-14px, 390px) rotate(420deg); opacity: 0; }
 }
+
+/* ---------- weekly blooms ---------- */
+.wk-tile { transition: transform 0.25s cubic-bezier(0.3, 1.5, 0.5, 1), box-shadow 0.25s ease; }
+.wk-tile:hover { transform: translateY(-3px); box-shadow: 0 12px 24px -14px var(--wk, var(--gold)); }
+.wk-flower-hover { transition: transform 0.35s cubic-bezier(0.3, 1.6, 0.5, 1); }
+.wk-tile:hover .wk-flower-hover { transform: scale(1.1) rotate(10deg); }
+.wk-petal-ring { animation: wkBreathe 4.2s ease-in-out infinite; animation-delay: calc(var(--i, 0) * -0.6s); }
+@keyframes wkBreathe { 0%, 100% { transform: scale(0.97) rotate(-2.5deg); } 50% { transform: scale(1.03) rotate(2.5deg); } }
+.wk-crown-ring { animation: spin 26s linear infinite; }
+.wk-tile:hover .wk-crown-ring { animation-duration: 10s; }
+.wk-leaf-l { animation: wkLeafL 3.8s ease-in-out infinite; }
+.wk-leaf-r { animation: wkLeafR 4.1s ease-in-out infinite; }
+@keyframes wkLeafL { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(3deg); } }
+@keyframes wkLeafR { 0%, 100% { transform: rotate(4deg); } 50% { transform: rotate(-3deg); } }
+
+/* ---------- rewards garden ---------- */
+.rw-wreath-spin { animation: spin 34s linear infinite; }
+.rw-petal-hover { transition: transform 0.35s cubic-bezier(0.3, 1.6, 0.5, 1); }
+.badge-tile.is-unlocked:hover .rw-petal-hover { transform: scale(1.14) rotate(14deg); }
+.rw-petal-breathe { animation: rwBreathe 3.8s ease-in-out infinite; animation-delay: calc(var(--i, 0) * -0.45s); }
+@keyframes rwBreathe { 0%, 100% { transform: scale(0.96); } 50% { transform: scale(1.04); } }
+.rw-bud-hover { transition: transform 0.3s cubic-bezier(0.3, 1.6, 0.5, 1); }
+.badge-tile:hover .rw-bud-hover { transform: scale(1.1); }
+.rw-bud-sway { animation: rwBudSway 4.8s ease-in-out infinite; animation-delay: calc(var(--i, 0) * -0.6s); }
+@keyframes rwBudSway { 0%, 100% { transform: rotate(-2.5deg); } 50% { transform: rotate(2.5deg); } }
+.rw-stat-sway { animation: rwBudSway 3.6s ease-in-out infinite; }
+.rw-stat-breathe { animation: rwBreathe 3.2s ease-in-out infinite; }
+.rw-bloom-pop { animation: rwBloomPop 0.55s cubic-bezier(0.3, 1.6, 0.5, 1) both; }
+@keyframes rwBloomPop { from { transform: scale(0.55); opacity: 0.3; } }

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Confetti, Floaters, RewardPopup, type CelebrationEvent, type Floater } from './components/Celebration'
 import { WeekdayChart, WeeklyDonuts } from './components/Charts'
 import { RhythmChart } from './components/RhythmChart'
-import { GardenHero, WeekdayFlower } from './components/Garden'
+import { GardenHero, WeekdayFlower, WeeklyBlooms } from './components/Garden'
 import { HabitGrid } from './components/HabitGrid'
 import { HabitModal } from './components/HabitModal'
 import { Header } from './components/Header'
@@ -183,7 +183,7 @@ export default function App() {
       {garden ? (
         <div className="grid gap-5 xl:grid-cols-3" key={`g-${view.y}-${view.m}`}>
           <WeekdayFlower stats={stats} />
-          <WeeklyDonuts stats={stats} month={view.m} className="xl:col-span-2" />
+          <WeeklyBlooms stats={stats} month={view.m} className="xl:col-span-2" />
         </div>
       ) : (
         <>
@@ -194,7 +194,7 @@ export default function App() {
           <WeeklyDonuts stats={stats} month={view.m} />
         </>
       )}
-      <RewardsPanel rewards={rewards} />
+      <RewardsPanel rewards={rewards} garden={garden} />
 
       <footer className="pb-4 pt-1 text-center text-[12px] text-ink-3">
         Your data is saved in this browser only. Use Backup to keep a copy.
