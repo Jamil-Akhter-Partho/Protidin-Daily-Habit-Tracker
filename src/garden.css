@@ -1,0 +1,173 @@
+/* =====================================================================
+   GARDEN STYLE
+   A separate look (data-style="garden"): rounded fonts, one bloom colour
+   family, plants that grow per day. Every colour derives from the hue
+   --bh, so a new bloom colour is a single number.
+   ===================================================================== */
+:root[data-bloom="pink"] { --bh: 352; }
+:root[data-bloom="lavender"] { --bh: 300; }
+:root[data-bloom="peach"] { --bh: 48; }
+:root[data-bloom="mint"] { --bh: 165; }
+:root[data-bloom="sky"] { --bh: 240; }
+
+:root[data-style="garden"] {
+  --ff-sans: "Nunito Variable", ui-rounded, system-ui, sans-serif;
+  --ff-display: "Fredoka Variable", "Nunito Variable", ui-rounded, sans-serif;
+  --radius-card: 28px;
+
+  /* the five weeks are neighbouring hues of the bloom colour */
+  --h1: calc(var(--bh) - 26); --h2: calc(var(--bh) - 13); --h3: var(--bh);
+  --h4: calc(var(--bh) + 13); --h5: calc(var(--bh) + 26);
+  --wL: 0.66; --wC: 0.16; --sL: 0.955; --sC: 0.03; --lL: 0.85; --lC: 0.08; --dL: 0.42; --dC: 0.13;
+  --w1: oklch(var(--wL) var(--wC) var(--h1)); --w1-soft: oklch(var(--sL) var(--sC) var(--h1)); --w1-line: oklch(var(--lL) var(--lC) var(--h1)); --w1-deep: oklch(var(--dL) var(--dC) var(--h1));
+  --w2: oklch(var(--wL) var(--wC) var(--h2)); --w2-soft: oklch(var(--sL) var(--sC) var(--h2)); --w2-line: oklch(var(--lL) var(--lC) var(--h2)); --w2-deep: oklch(var(--dL) var(--dC) var(--h2));
+  --w3: oklch(var(--wL) var(--wC) var(--h3)); --w3-soft: oklch(var(--sL) var(--sC) var(--h3)); --w3-line: oklch(var(--lL) var(--lC) var(--h3)); --w3-deep: oklch(var(--dL) var(--dC) var(--h3));
+  --w4: oklch(var(--wL) var(--wC) var(--h4)); --w4-soft: oklch(var(--sL) var(--sC) var(--h4)); --w4-line: oklch(var(--lL) var(--lC) var(--h4)); --w4-deep: oklch(var(--dL) var(--dC) var(--h4));
+  --w5: oklch(var(--wL) var(--wC) var(--h5)); --w5-soft: oklch(var(--sL) var(--sC) var(--h5)); --w5-line: oklch(var(--lL) var(--lC) var(--h5)); --w5-deep: oklch(var(--dL) var(--dC) var(--h5));
+  --on-wk: #ffffff;
+
+  --bg: oklch(0.975 0.014 var(--bh));
+  --surface: oklch(0.997 0.003 var(--bh));
+  --surface-2: oklch(0.955 0.024 var(--bh));
+  --ink: oklch(0.33 0.06 var(--bh));
+  --ink-2: oklch(0.47 0.06 var(--bh));
+  --ink-3: oklch(0.57 0.05 var(--bh));
+  --line: oklch(0.91 0.035 var(--bh));
+  --accent: oklch(0.58 0.17 var(--bh));
+  --on-accent: #ffffff;
+  --panel: oklch(0.46 0.13 var(--bh));
+  --bloom: oklch(0.68 0.16 var(--bh));
+  --on-bloom: #ffffff;
+  --petal-1: oklch(0.9 0.07 var(--bh));
+  --petal-2: oklch(0.8 0.12 var(--bh));
+  --petal-3: oklch(0.68 0.17 var(--bh));
+  --petal-hi: oklch(0.975 0.02 var(--bh));
+  --trunk: #8b5e4a; --soil: #b08a70; --leaf: #86c493; --leaf-2: #5faa74;
+  --hill: oklch(0.92 0.06 150); --sky-top: oklch(0.955 0.03 var(--h5));
+  --glow-c: oklch(0.86 0.1 var(--bh) / 0.45);
+  --primary-hover: brightness(1.1);
+  --shadow-card: 0 1px 2px oklch(0.5 0.1 var(--bh) / 0.06), 0 14px 30px -16px oklch(0.5 0.15 var(--bh) / 0.28);
+}
+
+:root[data-style="garden"][data-theme="dark"] {
+  --wL: 0.72; --wC: 0.15; --sL: 0.27; --sC: 0.045; --lL: 0.42; --lC: 0.08; --dL: 0.9; --dC: 0.06;
+  --on-wk: oklch(0.2 0.04 var(--bh));
+  --bg: oklch(0.19 0.025 var(--bh));
+  --surface: oklch(0.235 0.03 var(--bh));
+  --surface-2: oklch(0.29 0.038 var(--bh));
+  --ink: oklch(0.95 0.02 var(--bh));
+  --ink-2: oklch(0.82 0.04 var(--bh));
+  --ink-3: oklch(0.68 0.045 var(--bh));
+  --line: oklch(0.34 0.045 var(--bh));
+  --accent: oklch(0.8 0.12 var(--bh));
+  --on-accent: oklch(0.2 0.04 var(--bh));
+  --panel: oklch(0.32 0.075 var(--bh));
+  --bloom: oklch(0.72 0.15 var(--bh));
+  --on-bloom: oklch(0.2 0.04 var(--bh));
+  --petal-1: oklch(0.86 0.08 var(--bh));
+  --petal-2: oklch(0.76 0.13 var(--bh));
+  --petal-3: oklch(0.64 0.17 var(--bh));
+  --petal-hi: oklch(0.95 0.03 var(--bh));
+  --trunk: #a37866; --soil: #7b5c4b; --leaf: #7fc391; --leaf-2: #58a06d;
+  --hill: oklch(0.34 0.06 150); --sky-top: oklch(0.27 0.05 var(--h5));
+  --glow-c: oklch(0.6 0.15 var(--bh) / 0.22);
+  --primary-hover: brightness(0.92);
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.3), 0 10px 28px -14px rgb(0 0 0 / 0.6);
+}
+
+:root[data-style="garden"][data-theme="night"] {
+  --wL: 0.6; --wC: 0.13; --sL: 0.15; --sC: 0.03; --lL: 0.3; --lC: 0.06; --dL: 0.82; --dC: 0.07;
+  --on-wk: oklch(0.12 0.03 var(--bh));
+  --bg: #000000;
+  --surface: oklch(0.12 0.015 var(--bh));
+  --surface-2: oklch(0.175 0.022 var(--bh));
+  --ink: oklch(0.87 0.02 var(--bh));
+  --ink-2: oklch(0.72 0.035 var(--bh));
+  --ink-3: oklch(0.6 0.04 var(--bh));
+  --line: oklch(0.24 0.035 var(--bh));
+  --accent: oklch(0.72 0.11 var(--bh));
+  --on-accent: oklch(0.14 0.03 var(--bh));
+  --panel: oklch(0.17 0.035 var(--bh));
+  --bloom: oklch(0.6 0.13 var(--bh));
+  --on-bloom: oklch(0.12 0.03 var(--bh));
+  --petal-1: oklch(0.74 0.08 var(--bh));
+  --petal-2: oklch(0.64 0.12 var(--bh));
+  --petal-3: oklch(0.54 0.15 var(--bh));
+  --petal-hi: oklch(0.85 0.03 var(--bh));
+  --trunk: #7d5a4b; --soil: #5a4337; --leaf: #5f9a70; --leaf-2: #457c57;
+  --hill: oklch(0.2 0.04 150); --sky-top: oklch(0.13 0.03 var(--h5));
+  --glow-c: transparent;
+  --primary-hover: brightness(0.92);
+  --shadow-card: none;
+}
+
+:root[data-style="garden"] body {
+  background:
+    radial-gradient(900px 480px at 8% -10%, var(--glow-c), transparent 62%),
+    radial-gradient(900px 480px at 96% -12%, var(--glow-c), transparent 62%),
+    var(--bg);
+  background-attachment: fixed;
+}
+:root[data-style="garden"] .btn { border-radius: 999px; }
+:root[data-style="garden"] .icon-btn { border-radius: 999px; }
+:root[data-style="garden"] .field { border-radius: 16px; }
+:root[data-style="garden"] .box { border-radius: 8px; }
+:root[data-style="garden"] .wkhead {
+  background: var(--wk); border-top: 0; padding-top: 9px; border-radius: 16px 16px 0 0;
+  --wk-deep: var(--on-wk); --wk-soft: var(--wk);
+}
+:root[data-style="garden"] .wkfoot { border-radius: 0 0 16px 16px; }
+
+.garden-banner { background: var(--bloom); color: var(--on-bloom); }
+.garden-scene { background: linear-gradient(to bottom, var(--sky-top), var(--surface)); }
+.garden-hill {
+  position: absolute; left: -15%; right: -15%; bottom: -52px; height: 104px;
+  border-radius: 50%; background: var(--hill);
+}
+
+/* ---------- plants ---------- */
+.plant { display: block; overflow: visible; }
+.plant-grow { transform-origin: 32px 76px; animation: plantGrow 0.75s cubic-bezier(0.3, 1.5, 0.5, 1) both; }
+@keyframes plantGrow { 0% { transform: scale(0.4, 0.05); opacity: 0; } 35% { opacity: 1; } 100% { transform: scale(1); } }
+.puff { transform-box: fill-box; transform-origin: center; animation: puff 0.5s cubic-bezier(0.3, 1.7, 0.5, 1) both; animation-delay: calc(0.22s + var(--i, 0) * 45ms); }
+@keyframes puff { from { transform: scale(0); } }
+.canopy.sway { transform-origin: 32px 46px; animation: sway 5.5s ease-in-out infinite; }
+@keyframes sway { 0%, 100% { transform: rotate(-2.2deg); } 50% { transform: rotate(2.2deg); } }
+.twinkle { transform-box: fill-box; transform-origin: center; animation: twinkle 1.8s ease-in-out infinite; }
+@keyframes twinkle { 0%, 100% { transform: scale(0.3); opacity: 0.2; } 50% { transform: scale(1); opacity: 1; } }
+.plant-slot { display: flex; align-items: flex-end; justify-content: center; height: 58px; overflow: visible; }
+.plant-slot .plant { flex: none; }
+
+/* ---------- flower meadow chart ---------- */
+:root[data-style="garden"] .day-tip { --tip: var(--bloom); --tip-on: var(--on-bloom); border-radius: 18px; }
+.stem { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 0.7s ease-out forwards; animation-delay: calc(var(--i, 0) * 28ms); }
+.bloom-head {
+  transform-box: fill-box; transform-origin: center;
+  animation: puff 0.45s cubic-bezier(0.3, 1.7, 0.5, 1) both; animation-delay: calc(0.4s + var(--i, 0) * 28ms);
+  transition: scale 0.2s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+.is-active .bloom-head { scale: 1.45; }
+
+/* ---------- weekday flower ---------- */
+.wd-petal-g { outline: none; cursor: default; }
+.wd-petal {
+  transform-origin: 0 0;
+  animation: petalOpen 0.75s cubic-bezier(0.3, 1.4, 0.5, 1) both; animation-delay: calc(0.15s + var(--i, 0) * 70ms);
+  transition: filter 0.2s;
+}
+.wd-petal-g:hover .wd-petal, .wd-petal-g:focus-visible .wd-petal { filter: brightness(1.08) saturate(1.15); }
+@keyframes petalOpen { from { transform: scale(0); } }
+
+.petal-fall {
+  position: absolute; top: -14px; width: 10px; height: 7px; border-radius: 80% 0 80% 0;
+  background: var(--petal-2); opacity: 0; pointer-events: none;
+  animation: petalFall calc(5s + var(--i) * 0.45s) linear infinite; animation-delay: calc(var(--i) * -0.9s);
+}
+.petal-fall:nth-child(odd) { background: var(--petal-1); width: 8px; height: 6px; }
+@keyframes petalFall {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+  10% { opacity: 0.95; }
+  50% { transform: translate(26px, 125px) rotate(200deg); }
+  90% { opacity: 0.9; }
+  100% { transform: translate(-12px, 250px) rotate(420deg); opacity: 0; }
+}
