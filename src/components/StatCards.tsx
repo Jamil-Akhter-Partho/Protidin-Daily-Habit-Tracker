@@ -20,24 +20,26 @@ function Card({
   aside?: ReactNode
 }) {
   return (
-    <div className={`card rise wk-${wk} flex items-center gap-4 p-5`} style={{ ['--i' as string]: i }}>
-      <div className="min-w-0 flex-1">
+    <div className={`stat-card rise wk-${wk} flex items-center gap-4 p-5`} style={{ ['--i' as string]: i }}>
+      <div className="min-w-0 flex-1 relative z-1">
         <div className="mb-2 flex items-center gap-2 text-[12.5px] font-semibold text-ink-2">
-          <span className="grid size-7 place-items-center rounded-lg bg-(--wk-soft) text-(--wk-deep)">{icon}</span>
-          {label}
+          <span className="grid size-7 place-items-center rounded-lg bg-(--wk) text-white shadow-xs">
+            {icon}
+          </span>
+          <span className="font-bold tracking-tight">{label}</span>
         </div>
         {children}
       </div>
-      {aside}
+      {aside && <div className="relative z-1 shrink-0">{aside}</div>}
     </div>
   )
 }
 
 const Big = ({ children }: { children: ReactNode }) => (
-  <div className="num font-display text-[34px] font-extrabold leading-none tracking-tight">{children}</div>
+  <div className="num font-display text-[34px] font-extrabold leading-none tracking-tight text-ink">{children}</div>
 )
 const Sub = ({ children }: { children: ReactNode }) => (
-  <div className="mt-1.5 truncate text-[12.5px] text-ink-3">{children}</div>
+  <div className="mt-1.5 truncate text-[12.5px] font-medium text-ink-3">{children}</div>
 )
 
 export function StatCards({
@@ -67,7 +69,13 @@ export function StatCards({
         icon={<CalendarCheck size={15} />}
         label="Today"
         aside={
-          <Donut value={habitCount ? todayDone / habitCount : 0} size={64} stroke={8} color="var(--w2)" track="var(--w2-soft)" />
+          <Donut
+            value={habitCount ? todayDone / habitCount : 0}
+            size={64}
+            stroke={8}
+            color="var(--w2)"
+            track="color-mix(in srgb, var(--w2) 20%, transparent)"
+          />
         }
       >
         <Big>
@@ -82,8 +90,8 @@ export function StatCards({
           {monthN}
           <span className="text-[20px] text-ink-3">%</span>
         </Big>
-        <div className="bar-track mt-2.5">
-          <div className="bar-fill" style={{ width: `${stats.monthPct * 100}%`, background: 'var(--w4)' }} />
+        <div className="bar-track mt-2.5 bg-(--wk-line)/40">
+          <div className="bar-fill shadow-xs" style={{ width: `${stats.monthPct * 100}%`, background: 'var(--w4)' }} />
         </div>
         <Sub>
           {stats.monthDone} of {stats.monthGoal} target days

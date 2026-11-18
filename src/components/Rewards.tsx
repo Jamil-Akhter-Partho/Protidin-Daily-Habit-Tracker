@@ -5,7 +5,7 @@ import {
 } from 'lucide-react'
 import { useCountUp } from '../lib/hooks'
 import { BADGES, type Rewards } from '../lib/rewards'
-import { Donut } from './Charts'
+import { ChronometerDial } from './Charts'
 
 export const BADGE_ICONS: Record<string, LucideIcon> = {
   'first-step': Footprints,
@@ -20,6 +20,89 @@ export const BADGE_ICONS: Record<string, LucideIcon> = {
   'clean-sweep': Trophy,
   'streak-50': Gem,
   'checks-1000': Crown,
+}
+
+export type BadgeTier = 'bronze' | 'silver' | 'gold' | 'diamond'
+
+export interface TierInfo {
+  tier: BadgeTier
+  label: string
+  color: string
+  softBg: string
+  border: string
+  glow: string
+}
+
+export function getBadgeTier(xp: number): TierInfo {
+  if (xp >= 400) {
+    return {
+      tier: 'diamond',
+      label: 'Obsidian',
+      color: '#06b6d4',
+      softBg: 'rgba(6, 182, 212, 0.14)',
+      border: 'rgba(6, 182, 212, 0.45)',
+      glow: 'rgba(6, 182, 212, 0.25)',
+    }
+  }
+  if (xp >= 150) {
+    return {
+      tier: 'gold',
+      label: 'Gold',
+      color: '#eab308',
+      softBg: 'rgba(234, 179, 8, 0.14)',
+      border: 'rgba(234, 179, 8, 0.45)',
+      glow: 'rgba(234, 179, 8, 0.25)',
+    }
+  }
+  if (xp >= 75) {
+    return {
+      tier: 'silver',
+      label: 'Silver',
+      color: '#94a3b8',
+      softBg: 'rgba(148, 163, 184, 0.14)',
+      border: 'rgba(148, 163, 184, 0.35)',
+      glow: 'rgba(148, 163, 184, 0.2)',
+    }
+  }
+  return {
+    tier: 'bronze',
+    label: 'Bronze',
+    color: '#d97706',
+    softBg: 'rgba(217, 119, 6, 0.14)',
+    border: 'rgba(217, 119, 6, 0.35)',
+    glow: 'rgba(217, 119, 6, 0.2)',
+  }
+}
+
+function getBadgeProgress(badgeId: string, rewards: Rewards): number {
+  switch (badgeId) {
+    case 'first-step':
+      return Math.min(1, rewards.totalChecks / 1)
+    case 'streak-3':
+      return Math.min(1, rewards.longestStreak / 3)
+    case 'perfect-day':
+      return Math.min(1, rewards.perfectDays / 1)
+    case 'streak-7':
+      return Math.min(1, rewards.longestStreak / 7)
+    case 'checks-50':
+      return Math.min(1, rewards.totalChecks / 50)
+    case 'goal-hit':
+      return Math.min(1, rewards.goalsHit / 1)
+    case 'perfect-week':
+      return Math.min(1, rewards.longestPerfectRun / 7)
+    case 'streak-21':
+      return Math.min(1, rewards.longestStreak / 21)
+    case 'checks-250':
+      return Math.min(1, rewards.totalChecks / 250)
+    case 'clean-sweep':
+      return rewards.cleanSweep ? 1 : 0
+    case 'streak-50':
+      return Math.min(1, rewards.longestStreak / 50)
+    case 'checks-1000':
+      return Math.min(1, rewards.totalChecks / 1000)
+    default:
+      return 0
+  }
 }
 
 export function LevelChip({ rewards }: { rewards: Rewards }) {
@@ -170,80 +253,218 @@ export function RewardsPanel({ rewards, garden = false }: { rewards: Rewards; ga
   ]
 
   return (
-    <section id="rewards" className="card rise scroll-mt-6 p-5" style={{ ['--i' as string]: 9 }}>
-      <div className="mb-4 flex items-baseline justify-between gap-3">
-        <h2 className="font-display text-[17px] font-bold">Rewards</h2>
-        <span className="num text-[12.5px] text-ink-3">
+    <section id="rewards" className="gazette-card rise scroll-mt-6 p-5" style={{ ['--i' as string]: 9 }}>
+      <div className="mb-4 flex items-start justify-between gap-3">
+        <div>
+          <div className="flex items-center gap-2">
+            <h2 className="font-display text-[17px] font-bold text-ink">Rewards</h2>
+            <span className="rounded border border-line bg-surface-2 px-1.5 py-0.5 text-[9.5px] font-extrabold uppercase tracking-wider text-ink-3">
+              Prestige Vault
+            </span>
+          </div>
+          <p className="mt-0.5 text-[12px] text-ink-3">Milestone achievements & royal honor medallions</p>
+        </div>
+        <span className="num text-[12px] font-bold text-ink-3">
           {rewards.unlocked.size} of {BADGES.length} badges unlocked
         </span>
       </div>
 
-      <div className="grid gap-5 xl:grid-cols-[320px_1fr]">
-        <div className="flex flex-col rounded-2xl bg-panel p-5 text-white">
-          <div className="flex items-center gap-4">
-            {garden ? (
-              <LevelWreath level={rewards.level} progress={rewards.intoLevel / rewards.levelSize} />
-            ) : (
-              <Donut value={rewards.intoLevel / rewards.levelSize} size={104} stroke={10} color="var(--gold)" track="rgb(255 255 255 / 0.14)">
-                <div className="text-center leading-none">
-                  <div className="text-[10px] font-bold uppercase tracking-widest opacity-70">Level</div>
-                  <div className="num font-display text-[34px] font-extrabold">{rewards.level}</div>
+      <div className="grid gap-5 xl:grid-cols-[320px_1fr] items-start">
+        {/* Left: Royal Level Showcase Card */}
+        <div className="relative flex flex-col justify-between overflow-hidden rounded-2xl bg-panel p-5 text-white shadow-md border border-(--gold)/30">
+          {/* Top Royal Gold Accent Band */}
+          <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-amber-600 via-(--gold) to-amber-700" />
+
+          <div>
+            {/* Heraldic Header */}
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <span className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-gold">
+                <span>⚜️</span> Royal Heraldry
+              </span>
+              <span className="rounded border border-(--gold)/30 bg-(--gold)/10 px-2 py-0.5 text-[10px] font-bold text-gold">
+                Tier {Math.min(10, Math.max(1, rewards.level))}
+              </span>
+            </div>
+
+            {/* Chronometer Level Dial + XP info */}
+            <div className="mt-4 flex items-center gap-4">
+              {garden ? (
+                <LevelWreath level={rewards.level} progress={rewards.intoLevel / rewards.levelSize} />
+              ) : (
+                <ChronometerDial
+                  value={rewards.levelSize > 0 ? rewards.intoLevel / rewards.levelSize : 0}
+                  size={88}
+                  color="var(--gold)"
+                  track="rgba(255, 255, 255, 0.15)"
+                  tickColor="rgba(212, 175, 55, 0.55)"
+                >
+                  <div className="text-center leading-none">
+                    <div className="text-[9px] font-black uppercase tracking-widest text-gold/80">Level</div>
+                    <div className="num font-display text-[26px] font-black leading-tight text-white">{rewards.level}</div>
+                  </div>
+                </ChronometerDial>
+              )}
+
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1.5 font-display text-[20px] font-black tracking-tight text-white">
+                  <Award size={19} className="text-gold shrink-0" />
+                  <span className="truncate">{rewards.title}</span>
                 </div>
-              </Donut>
-            )}
-            <div className="min-w-0">
-              <div className="flex items-center gap-1.5 font-display text-[22px] font-extrabold">
-                <Award size={20} className="text-gold" /> {rewards.title}
-              </div>
-              <div className="num mt-1 text-[13px] opacity-80">{xp.toLocaleString()} XP earned</div>
-              <div className="num mt-0.5 text-[12.5px] opacity-60">
-                {toNext} XP to level {rewards.level + 1}
+                <div className="num mt-1 text-[13px] font-bold text-amber-200/90">
+                  {xp.toLocaleString()} XP earned
+                </div>
+
+                {/* Horizontal XP Progress Capsule */}
+                <div className="mt-2.5 h-2 w-full max-w-[170px] overflow-hidden rounded-full bg-black/50 p-0.5 border border-white/10">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-300 transition-all duration-700 shadow-xs"
+                    style={{ width: `${Math.max(4, Math.min(100, (rewards.intoLevel / rewards.levelSize) * 100))}%` }}
+                  />
+                </div>
+                <div className="num mt-1.5 text-[10.5px] font-medium text-white/60">
+                  {toNext} XP to level {rewards.level + 1}
+                </div>
               </div>
             </div>
-          </div>
-          <div className="mt-5 grid grid-cols-3 gap-2">
-            {facts.map((f) => (
-              <div key={f.label} className="rounded-xl bg-white/10 px-2 py-2.5 text-center">
-                <div className="flex items-center justify-center gap-1">
-                  {garden && <StatFlora kind={f.key} />}
-                  <div className="num font-display text-[20px] font-extrabold leading-none">{f.value}</div>
+
+            {/* 3 Stat Blocks */}
+            <div className="mt-5 grid grid-cols-3 gap-2">
+              {facts.map((f) => (
+                <div key={f.label} className="rounded-xl border border-white/10 bg-white/5 p-2 text-center transition-colors hover:bg-white/10">
+                  <div className="flex items-center justify-center gap-1">
+                    {garden && <StatFlora kind={f.key} />}
+                    <div className={`num font-display text-[18px] font-black leading-tight ${
+                      f.key === 'streak' ? 'text-gold' : f.key === 'perfect' ? 'text-good' : 'text-white'
+                    }`}>
+                      {f.value}
+                    </div>
+                  </div>
+                  <div className="mt-0.5 text-[10px] font-medium text-white/60">{f.label}</div>
                 </div>
-                <div className="mt-1 text-[10.5px] opacity-70">{f.label}</div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-          <p className="mt-4 text-[12px] opacity-60">Every tick earns 10 XP. Badges add bonus XP.</p>
+
+          {/* Footer note */}
+          <div className="mt-4 flex items-center justify-between border-t border-white/10 pt-3 text-[11px] text-white/60">
+            <span>Every tick: <b className="text-amber-300">+10 XP</b></span>
+            <span>Badges: <b className="text-gold">Bonus XP</b></span>
+          </div>
         </div>
 
+        {/* Right: 12 Badges Grid */}
         <div className="grid grid-cols-2 gap-3 md:grid-cols-3 2xl:grid-cols-4">
           {BADGES.map((b, i) => {
             const on = rewards.unlocked.has(b.id)
             const Icon = BADGE_ICONS[b.id] ?? Award
+            const tier = getBadgeTier(b.xp)
+            const progress = getBadgeProgress(b.id, rewards)
+
+            if (garden) {
+              return (
+                <div
+                  key={b.id}
+                  className={`badge-tile wk-${(i % 5) + 1} flex items-center gap-3 rounded-2xl border p-3 ${
+                    on ? 'is-unlocked border-(--wk-line) bg-(--wk-soft)' : 'border-line bg-surface-2 hover:border-(--wk-line)'
+                  }`}
+                  style={{ ['--i' as string]: i }}
+                >
+                  <BadgeBloom unlocked={on} xp={b.xp} index={i} Icon={Icon} />
+                  <div className="min-w-0">
+                    <div className={`truncate text-[13px] font-bold ${on ? 'text-(--wk-deep)' : 'text-ink-2'}`}>{b.name}</div>
+                    <div className={`truncate text-[11.5px] ${on ? 'text-(--wk-deep) opacity-75' : 'text-ink-3'}`} title={b.desc}>
+                      {b.desc}
+                    </div>
+                    <div className={`num mt-0.5 text-[11px] font-bold ${on ? 'text-(--wk-deep)' : 'text-ink-3'}`}>+{b.xp} XP</div>
+                  </div>
+                </div>
+              )
+            }
+
+            // Concept 1: Royal Vintage Trophy Vault
+            if (on) {
+              return (
+                <div
+                  key={b.id}
+                  className="badge-tile is-unlocked group relative flex items-center gap-3 rounded-2xl border p-3 transition-all duration-300 hover:scale-[1.02] shadow-xs cursor-pointer overflow-hidden"
+                  style={{
+                    ['--i' as string]: i,
+                    background: 'color-mix(in srgb, var(--surface) 93%, var(--gold))',
+                    borderColor: tier.color,
+                    boxShadow: `0 4px 16px -4px ${tier.glow}`,
+                  }}
+                  title={`${b.name}: ${b.desc}`}
+                >
+                  {/* Shiny Metallic Medallion Icon */}
+                  <div
+                    className="badge-icon relative grid size-11 shrink-0 place-items-center rounded-xl shadow-xs overflow-hidden"
+                    style={{
+                      background: `linear-gradient(135deg, ${tier.color} 0%, color-mix(in srgb, ${tier.color} 65%, #000) 100%)`,
+                      color: '#ffffff',
+                    }}
+                  >
+                    <Icon size={20} strokeWidth={2.4} />
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-1">
+                      <span className="truncate text-[13px] font-black text-ink">{b.name}</span>
+                      <span
+                        className="rounded px-1.5 py-0.5 text-[9.5px] font-black uppercase tracking-wider font-num"
+                        style={{ background: tier.softBg, color: tier.color, border: `1px solid ${tier.border}` }}
+                      >
+                        {tier.label}
+                      </span>
+                    </div>
+                    <div className="truncate text-[11px] text-ink-3 mt-0.5" title={b.desc}>
+                      {b.desc}
+                    </div>
+                    <div className="num mt-1 flex items-center gap-1 text-[11px] font-black" style={{ color: tier.color }}>
+                      <span>✨</span> +{b.xp} XP
+                    </div>
+                  </div>
+                </div>
+              )
+            }
+
+            // Locked State: Engraved Ghost Silhouette with Subtle Micro Lock
             return (
               <div
                 key={b.id}
-                className={`badge-tile wk-${(i % 5) + 1} flex items-center gap-3 rounded-2xl border p-3 ${
-                  on ? 'is-unlocked border-(--wk-line) bg-(--wk-soft)' : 'border-line bg-surface-2 hover:border-(--wk-line)'
-                }`}
+                className="group relative flex items-center gap-3 rounded-2xl border border-line/75 bg-surface-2/65 p-3 transition-all duration-200 hover:bg-surface-2 hover:border-line"
                 style={{ ['--i' as string]: i }}
+                title={`${b.name} (Locked): ${b.desc}`}
               >
-                {garden ? (
-                  <BadgeBloom unlocked={on} xp={b.xp} index={i} Icon={Icon} />
-                ) : (
-                  <div
-                    className={`badge-icon grid size-11 shrink-0 place-items-center rounded-xl ${
-                      on ? 'bg-(--wk) text-white' : 'bg-surface text-ink-3'
-                    }`}
-                  >
-                    {on ? <Icon size={21} /> : <Lock size={17} />}
+                {/* Engraved Ghost Silhouette with Subtle Lock */}
+                <div
+                  className="relative grid size-11 shrink-0 place-items-center rounded-xl border border-line/60 bg-surface/80"
+                  style={{ color: tier.color }}
+                >
+                  <div className="opacity-40 transition-opacity duration-200 group-hover:opacity-65">
+                    <Icon size={19} strokeWidth={2.2} />
                   </div>
-                )}
-                <div className="min-w-0">
-                  <div className={`truncate text-[13px] font-bold ${on ? 'text-(--wk-deep)' : 'text-ink-2'}`}>{b.name}</div>
-                  <div className={`truncate text-[11.5px] ${on ? 'text-(--wk-deep) opacity-75' : 'text-ink-3'}`} title={b.desc}>
+                  <div className="absolute -bottom-1 -right-1 grid size-4 place-items-center rounded-full border border-line bg-surface-2 text-ink-3 shadow-xs">
+                    <Lock size={8} strokeWidth={2.6} />
+                  </div>
+                </div>
+
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between gap-1">
+                    <span className="truncate text-[12.5px] font-bold text-ink-2">{b.name}</span>
+                    <span
+                      className="text-[9px] font-bold uppercase font-num opacity-70"
+                      style={{ color: tier.color }}
+                    >
+                      {tier.label}
+                    </span>
+                  </div>
+                  <div className="truncate text-[11px] text-ink-3 mt-0.5" title={b.desc}>
                     {b.desc}
                   </div>
-                  <div className={`num mt-0.5 text-[11px] font-bold ${on ? 'text-(--wk-deep)' : 'text-ink-3'}`}>+{b.xp} XP</div>
+                  <div className="num mt-1 flex items-center justify-between text-[10.5px] font-semibold text-ink-3">
+                    <span>+{b.xp} XP</span>
+                    <span className="text-[9.5px] opacity-75">{Math.round(progress * 100)}%</span>
+                  </div>
                 </div>
               </div>
             )

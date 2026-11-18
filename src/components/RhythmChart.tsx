@@ -78,19 +78,24 @@ export function RhythmChart({
     }`
 
   return (
-    <section className="card rise flex flex-col p-5 xl:col-span-2" style={{ ['--i' as string]: 6 }}>
+    <section className="gazette-card rise flex flex-col p-5 xl:col-span-2" style={{ ['--i' as string]: 6 }}>
       <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="font-display text-[17px] font-bold">Daily rhythm</h2>
-          <p className="text-[12.5px] text-ink-3">
-            {habit ? `Days you did “${habit.name}”` : 'How much of each day you completed'}
+          <div className="flex items-center gap-2">
+            <h2 className="font-display text-[17px] font-bold text-ink">Daily rhythm</h2>
+            <span className="rounded border border-line bg-surface-2 px-1.5 py-0.5 text-[9.5px] font-extrabold uppercase tracking-wider text-ink-3">
+              Folio 30D
+            </span>
+          </div>
+          <p className="mt-0.5 text-[12px] text-ink-3">
+            {habit ? `Recorded audit for “${habit.name}”` : 'Daily completion audit & temporal velocity'}
           </p>
         </div>
         <div className="flex gap-2">
           {chips.map((c) => (
-            <div key={c.label} className="rounded-xl bg-surface-2 px-3 py-1.5 text-center">
-              <div className="num font-display text-[16px] font-bold leading-tight">{c.value}</div>
-              <div className="text-[10.5px] text-ink-3">{c.label}</div>
+            <div key={c.label} className="gazette-stamp text-center">
+              <div className="num font-display text-[15px] font-bold leading-tight text-ink">{c.value}</div>
+              <div className="text-[9.5px] font-bold uppercase tracking-wider text-ink-3">{c.label}</div>
             </div>
           ))}
         </div>
@@ -117,9 +122,9 @@ export function RhythmChart({
         </div>
       )}
 
-      <div className="flex flex-1 items-center">
+      <div className="flex flex-1 flex-col justify-center">
         <div
-          className="daychart relative w-full"
+          className="daychart gazette-inner relative w-full p-3.5"
           tabIndex={pts.length ? 0 : -1}
           role="group"
           aria-label={`Daily rhythm for ${MONTHS[month]} ${year}. Use the left and right arrow keys to move between days.`}
@@ -166,12 +171,12 @@ export function RhythmChart({
               )
             })}
 
-            {/* average line (all habits only) */}
+            {/* average line (all habits only) with vintage crimson rule */}
             {!habit && pts.length > 1 && (
               <g>
-                <line x1={L - step / 2} x2={W - R + step / 2} y1={y(avg)} y2={y(avg)} stroke="var(--accent)" strokeWidth="1.4" strokeDasharray="6 5" opacity="0.8" />
-                <rect x={W - R + step / 2 - 54} y={y(avg) - 9} width="54" height="18" rx="9" fill="var(--accent)" />
-                <text x={W - R + step / 2 - 27} y={y(avg) + 3.6} textAnchor="middle" fontSize="9.5" fontWeight="800" fill="var(--on-accent)" className="num">
+                <line x1={L - step / 2} x2={W - R + step / 2} y1={y(avg)} y2={y(avg)} stroke="var(--danger)" strokeWidth="1.5" strokeDasharray="6 4" opacity="0.9" />
+                <rect x={W - R + step / 2 - 54} y={y(avg) - 9} width="54" height="18" rx="4" fill="var(--danger)" />
+                <text x={W - R + step / 2 - 27} y={y(avg) + 3.6} textAnchor="middle" fontSize="9.5" fontWeight="800" fill="#ffffff" className="num">
                   avg {pctText(avg)}
                 </text>
               </g>
@@ -183,7 +188,7 @@ export function RhythmChart({
               const now = isToday(d)
               return (
                 <g key={d}>
-                  {(now || on) && <rect x={x(d) - 10} y={H - 29} width="20" height="18" rx="9" fill={now ? 'var(--accent)' : 'var(--surface-2)'} />}
+                  {(now || on) && <rect x={x(d) - 10} y={H - 29} width="20" height="18" rx="5" fill={now ? 'var(--accent)' : 'var(--surface-2)'} />}
                   <text
                     x={x(d)}
                     y={H - 16}
@@ -223,6 +228,10 @@ export function RhythmChart({
               pinned={focus.pinned === tip.d}
             />
           )}
+        </div>
+        <div className="mt-2.5 flex items-center justify-between text-[11px] font-medium text-ink-3">
+          <span>* Recorded in chronological order (Days 1–{dim})</span>
+          <span className="num font-bold">Folio {year}-{String(month + 1).padStart(2, '0')}</span>
         </div>
       </div>
     </section>

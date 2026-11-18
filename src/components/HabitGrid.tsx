@@ -32,7 +32,7 @@ export function HabitGrid({
   const habitCount = perHabit.length
   const cols = `clamp(190px, 15vw, 250px) ${weeks
     .map((w) => `minmax(0, ${w.end - w.start + 1}fr)`)
-    .join(' ')} 58px 124px 46px`
+    .join(' ')} 246px`
   const style = { gridTemplateColumns: cols }
   const inner = (len: number) => ({ gridTemplateColumns: `repeat(${len}, minmax(0, 1fr))` })
   const days = (start: number, end: number) => Array.from({ length: end - start + 1 }, (_, i) => start + i)
@@ -70,7 +70,17 @@ export function HabitGrid({
 
         {/* header */}
         <div className="hgrid" style={style}>
-          <div className="flex items-end pb-2 pl-2 text-[12px] font-bold uppercase tracking-wider text-ink-3">Habits</div>
+          <div className="hab-head flex flex-col justify-between">
+            <div className="flex items-center justify-between">
+              <span className="text-[11.5px] font-extrabold uppercase tracking-wider text-ink">Habits</span>
+              <span className="num rounded-md border border-line bg-surface px-1.5 py-0.5 text-[9.5px] font-bold text-ink-2 shadow-xs">
+                {habitCount} Total
+              </span>
+            </div>
+            <div className="flex items-center text-[10px] font-medium text-ink-3">
+              <span>Daily habits list</span>
+            </div>
+          </div>
           {weeks.map((w) => (
             <div key={w.index} className={`wkblock wkhead wk-${w.index + 1}`} style={inner(w.end - w.start + 1)}>
               <div
@@ -99,22 +109,24 @@ export function HabitGrid({
               })}
             </div>
           ))}
-          {['Goal', 'Progress', 'Streak'].map((t) => (
-            <div key={t} className="flex items-end justify-center pb-2 text-[12px] font-bold uppercase tracking-wider text-ink-3">
-              {t}
-            </div>
-          ))}
+          <div className="sum-block sum-head grid grid-cols-[62px_1fr_50px] items-center px-1 text-center">
+            <div className="pb-1 text-[11px] font-extrabold uppercase tracking-wider text-ink-2">Goal</div>
+            <div className="pb-1 text-[11px] font-extrabold uppercase tracking-wider text-ink-2">Progress</div>
+            <div className="pb-1 text-[11px] font-extrabold uppercase tracking-wider text-ink-2">Streak</div>
+          </div>
         </div>
 
         {/* rows */}
         {perHabit.map(({ habit, done, goal, pct, streak }, i) => (
           <div key={habit.id} className="hgrid hrow" style={style}>
-            <div className="hname relative flex min-w-0 items-center gap-2.5 pl-2 pr-1">
-              <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-surface-2 text-[15px]">{habit.emoji}</span>
-              <span className="truncate text-[13.5px] font-semibold" title={habit.name}>
+            <div className="hname relative flex min-w-0 items-center gap-2.5 px-2.5">
+              <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-surface-2 border border-line/60 text-[15px] shadow-xs">
+                {habit.emoji}
+              </span>
+              <span className="truncate text-[13px] font-semibold text-ink" title={habit.name}>
                 {habit.name}
               </span>
-              <div className="row-actions absolute inset-y-0 right-0 flex items-center rounded-r-xl bg-surface-2 pl-1">
+              <div className="row-actions absolute inset-y-0 right-1 flex items-center rounded-r-xl bg-surface-2 pl-1">
                 <button className="icon-btn !size-7" onClick={() => onMove(habit.id, -1)} disabled={i === 0} aria-label={`Move ${habit.name} up`}>
                   <ArrowUp size={14} />
                 </button>
@@ -158,34 +170,60 @@ export function HabitGrid({
               </div>
             ))}
 
-            <div className="num flex items-center justify-center text-[13px]">
-              <span className="font-bold">{done}</span>
-              <span className="text-ink-3">/{goal}</span>
-            </div>
-            <div className="flex items-center gap-2 px-1">
-              <div className="bar-track flex-1">
-                <div className={`bar-fill ${pct >= 1 ? 'is-done' : ''}`} style={{ width: `${pct * 100}%` }} />
+            <div className="sum-block sum-row grid grid-cols-[62px_1fr_50px] items-center px-1.5 py-1">
+              <div className="num flex items-center justify-center">
+                <span className="goal-badge text-[12px] font-bold">
+                  {done}<span className="text-[10.5px] opacity-60">/{goal}</span>
+                </span>
               </div>
-              <span className="num w-9 text-right text-[12px] font-semibold text-ink-2">{Math.round(pct * 100)}%</span>
-            </div>
-            <div
-              className={`num flex items-center justify-center gap-0.5 text-[13px] font-bold ${streak ? 'text-flame' : 'text-ink-3'}`}
-              title={streak ? `${streak}-day streak` : 'No active streak'}
-            >
-              {streak ? (
-                <>
-                  <Flame size={14} fill="currentColor" /> {streak}
-                </>
-              ) : (
-                '–'
-              )}
+              <div className="flex flex-col justify-center px-2 min-w-0">
+                <div className="bar-track h-2 w-full overflow-hidden rounded-full bg-black/20 dark:bg-white/10">
+                  <div
+                    className={`bar-fill h-full rounded-full transition-all duration-500 ${pct >= 1 ? 'is-done' : ''}`}
+                    style={{
+                      width: `${Math.min(100, Math.round(pct * 100))}%`,
+                      background: pct >= 1
+                        ? 'linear-gradient(90deg, #10b981 0%, #34d399 100%)'
+                        : 'linear-gradient(90deg, #3b82f6 0%, #06b6d4 100%)',
+                      boxShadow: pct >= 1
+                        ? '0 0 10px rgba(16, 185, 129, 0.45)'
+                        : '0 0 8px rgba(6, 182, 212, 0.35)',
+                    }}
+                  />
+                </div>
+                <div className="mt-1 flex items-center justify-between text-[10.5px] font-semibold">
+                  <span className={`num font-bold ${pct >= 1 ? 'text-good' : 'text-ink-2'}`}>
+                    {Math.round(pct * 100)}%
+                  </span>
+                  {pct >= 1 ? (
+                    <span className="text-[9.5px] font-extrabold text-good">Done! ✨</span>
+                  ) : goal && goal > done ? (
+                    <span className="num text-[9.5px] text-ink-3">{goal - done} left</span>
+                  ) : null}
+                </div>
+              </div>
+              <div className="flex items-center justify-center">
+                {streak ? (
+                  <span
+                    className="streak-badge inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 text-[11px] font-black"
+                    title={`${streak}-day streak`}
+                  >
+                    <Flame size={12} fill="currentColor" /> {streak}
+                  </span>
+                ) : (
+                  <span className="num text-[12px] font-bold text-ink-3/40">–</span>
+                )}
+              </div>
             </div>
           </div>
         ))}
 
         {/* daily totals */}
         <div className="hgrid" style={style}>
-          <div className="flex items-center pl-2 text-[12px] font-semibold text-ink-3">Done per day</div>
+          <div className="hab-foot flex items-center justify-between">
+            <span className="text-[11.5px] font-bold text-ink-2">Done per day</span>
+            <span className="text-[9.5px] font-semibold text-ink-3 opacity-80">Daily total</span>
+          </div>
           {weeks.map((w) => (
             <div key={w.index} className={`wkblock wkfoot wk-${w.index + 1}`} style={inner(w.end - w.start + 1)}>
               {days(w.start, w.end).map((d) => {
@@ -205,9 +243,10 @@ export function HabitGrid({
               })}
             </div>
           ))}
-          <div className="col-span-3 flex items-center justify-end pr-2 text-[12px] text-ink-3">
-            <span className="num">
-              {perDay.reduce((a, b) => a + b, 0)} ticks in {dim} days
+          <div className="sum-block sum-foot flex items-center justify-center px-2 py-2">
+            <span className="sum-total-pill num inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-bold shadow-xs">
+              <span>{perDay.reduce((a, b) => a + b, 0)}</span>
+              <span className="opacity-75">ticks in {dim}d</span>
             </span>
           </div>
         </div>

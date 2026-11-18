@@ -38,6 +38,12 @@
   --row-hover: brightness(0.965) saturate(1.15);
   --primary-hover: brightness(1.18);
   --glow: 0.1;
+  --sum-bg: rgb(255 255 255 / 0.7);
+  --sum-bg-hover: rgb(255 255 255 / 0.9);
+  --sum-border: rgb(203 213 225 / 0.8);
+  --sum-neon: #3b82f6;
+  --sum-neon-glow: rgba(59, 130, 246, 0.2);
+  --sum-pill-bg: #f1f5f9;
   color-scheme: light;
 }
 
@@ -70,6 +76,12 @@
   --row-hover: brightness(1.18);
   --primary-hover: brightness(0.9);
   --glow: 0.07;
+  --sum-bg: rgb(18 22 34 / 0.55);
+  --sum-bg-hover: rgb(26 32 50 / 0.75);
+  --sum-border: rgb(51 65 85 / 0.65);
+  --sum-neon: #60a5fa;
+  --sum-neon-glow: rgba(96, 165, 250, 0.28);
+  --sum-pill-bg: rgb(255 255 255 / 0.06);
   color-scheme: dark;
 }
 
@@ -103,6 +115,12 @@
   --row-hover: brightness(1.25);
   --primary-hover: brightness(0.9);
   --glow: 0;
+  --sum-bg: rgb(11 11 15 / 0.7);
+  --sum-bg-hover: rgb(18 18 24 / 0.9);
+  --sum-border: rgb(32 31 39 / 0.85);
+  --sum-neon: #4278cc;
+  --sum-neon-glow: rgba(66, 120, 204, 0.22);
+  --sum-pill-bg: rgb(255 255 255 / 0.04);
   color-scheme: dark;
 }
 
@@ -200,6 +218,95 @@ body {
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-card);
 }
+
+/* ---------- KPI stat cards (Concept 3: Soft Gradient Glow) ---------- */
+.stat-card {
+  position: relative;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--wk) 14%, var(--surface)) 0%, var(--surface) 72%);
+  border: 1.5px solid color-mix(in srgb, var(--wk) 36%, var(--line));
+  border-radius: var(--radius-card);
+  box-shadow: 0 4px 18px -4px color-mix(in srgb, var(--wk) 22%, transparent), var(--shadow-card);
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s, border-color 0.25s;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 150px;
+  height: 150px;
+  background: radial-gradient(circle at top left, var(--wk) 0%, transparent 70%);
+  opacity: 0.16;
+  pointer-events: none;
+}
+
+:root[data-theme="dark"] .stat-card {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--wk) 24%, var(--surface)) 0%, var(--surface) 72%);
+  border: 1.5px solid color-mix(in srgb, var(--wk) 42%, var(--line));
+  box-shadow: 0 4px 22px -4px color-mix(in srgb, var(--wk) 28%, transparent), var(--shadow-card);
+}
+
+:root[data-theme="dark"] .stat-card::before {
+  opacity: 0.24;
+}
+
+:root[data-theme="night"] .stat-card {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--wk) 20%, #0b0b0e) 0%, #0b0b0e 74%);
+  border: 1.5px solid color-mix(in srgb, var(--wk) 35%, #201f27);
+  box-shadow: 0 4px 22px -4px color-mix(in srgb, var(--wk) 22%, transparent);
+}
+
+:root[data-theme="night"] .stat-card::before {
+  opacity: 0.26;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--wk);
+  box-shadow: 0 8px 26px -4px var(--wk), var(--shadow-card);
+}
+
+/* ---------- Concept 3: Heritage Editorial Gazette ---------- */
+.gazette-card {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-top: 4px solid var(--accent);
+  border-radius: var(--radius-card);
+  box-shadow: 0 2px 10px -2px rgba(0, 0, 0, 0.05), var(--shadow-card);
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s;
+}
+
+.gazette-inner {
+  background: color-mix(in srgb, var(--surface-2) 65%, var(--surface));
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+
+:root[data-theme="dark"] .gazette-inner {
+  background: rgba(0, 0, 0, 0.25);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+:root[data-theme="night"] .gazette-inner {
+  background: #08080a;
+  border-color: #1a1921;
+}
+
+.gazette-stamp {
+  background: var(--surface-2);
+  border: 1px dashed color-mix(in srgb, var(--ink-3) 40%, transparent);
+  border-radius: 10px;
+  padding: 4px 10px;
+  transition: transform 0.15s, border-color 0.15s;
+}
+
+.gazette-stamp:hover {
+  border-color: var(--accent);
+  border-style: solid;
+}
 .rise { animation: rise 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both; animation-delay: calc(var(--i, 0) * 60ms); }
 @keyframes rise { from { opacity: 0; transform: translateY(14px); } }
 
@@ -233,10 +340,128 @@ body {
 .wkfoot { border-radius: 0 0 14px 14px; padding-bottom: 8px; }
 .hrow .wkblock { box-shadow: inset 0 1px 0 var(--wk-sep); transition: filter 0.15s; }
 .hrow:hover .wkblock { filter: var(--row-hover); }
-.hrow .hname { border-radius: 12px; transition: background 0.15s; }
-.hrow:hover .hname { background: var(--surface-2); }
+
+/* ---------- habit column (Design 3: Floating Row Capsules) ---------- */
+.hab-head {
+  border-radius: 14px 14px 0 0;
+  border-top: 3.5px solid var(--accent);
+  border-left: 1px solid var(--line);
+  border-right: 1px solid var(--line);
+  background: var(--surface-2);
+  padding: 8px 12px 6px 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+.hab-foot {
+  border-radius: 0 0 14px 14px;
+  border-bottom: 1.5px solid var(--line);
+  border-left: 1px solid var(--line);
+  border-right: 1px solid var(--line);
+  background: var(--surface-2);
+  padding: 0 12px;
+}
+.hrow .hname {
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: transform 0.15s, background 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+.hrow:hover .hname {
+  background: var(--surface-2);
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--line));
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+:root[data-theme="dark"] .hab-head,
+:root[data-theme="dark"] .hab-foot {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+  border-top-color: var(--accent);
+}
+:root[data-theme="dark"] .hrow .hname {
+  background: rgba(255, 255, 255, 0.025);
+  border-color: rgba(255, 255, 255, 0.07);
+}
+:root[data-theme="dark"] .hrow:hover .hname {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+
+:root[data-theme="night"] .hab-head,
+:root[data-theme="night"] .hab-foot {
+  background: rgba(255, 255, 255, 0.02);
+  border-color: #201f27;
+  border-top-color: var(--accent);
+}
+:root[data-theme="night"] .hrow .hname {
+  background: rgba(255, 255, 255, 0.015);
+  border-color: #201f27;
+}
+:root[data-theme="night"] .hrow:hover .hname {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: #322f3f;
+}
+
 .row-actions { opacity: 0; transition: opacity 0.15s; }
 .hrow:hover .row-actions, .hrow:focus-within .row-actions { opacity: 1; }
+
+/* ---------- summary column (Option 3: Frosted Glass & Neon Badges) ---------- */
+.sum-block {
+  background: var(--sum-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-left: 1px solid var(--sum-border);
+  border-right: 3.5px solid var(--sum-neon);
+  box-shadow: 0 2px 14px -2px var(--sum-neon-glow);
+  transition: background 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+.sum-head {
+  border-top: 3px solid var(--sum-neon);
+  border-radius: 14px 14px 0 0;
+  padding-top: 6px;
+  padding-bottom: 4px;
+}
+.sum-foot {
+  border-bottom: 1.5px solid var(--sum-border);
+  border-radius: 0 0 14px 14px;
+}
+.hrow .sum-row {
+  box-shadow: inset 0 1px 0 var(--wk-sep);
+  transition: background 0.15s, box-shadow 0.15s;
+}
+.hrow:hover .sum-row {
+  background: var(--sum-bg-hover);
+  box-shadow: 0 4px 18px -2px var(--sum-neon-glow);
+}
+.goal-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5px 7px;
+  border-radius: 8px;
+  background: var(--sum-pill-bg);
+  border: 1px solid var(--sum-border);
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  transition: transform 0.15s, border-color 0.15s;
+}
+.streak-badge {
+  background: color-mix(in srgb, var(--flame) 18%, transparent);
+  color: var(--flame);
+  border: 1px solid color-mix(in srgb, var(--flame) 35%, transparent);
+  box-shadow: 0 2px 8px -2px var(--flame);
+  animation: flamePulse 2.5s ease-in-out infinite;
+}
+@keyframes flamePulse {
+  0%, 100% { opacity: 0.95; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.04); filter: drop-shadow(0 0 4px var(--flame)); }
+}
+.sum-total-pill {
+  background: color-mix(in srgb, var(--sum-neon) 14%, transparent);
+  color: var(--sum-neon);
+  border: 1px solid color-mix(in srgb, var(--sum-neon) 30%, transparent);
+}
 
 .cell {
   position: relative; display: grid; place-items: center;
