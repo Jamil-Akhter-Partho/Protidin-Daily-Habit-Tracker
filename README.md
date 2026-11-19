@@ -6,14 +6,11 @@
 
 **A beautifully animated, privacy-first, client-side daily habit tracker engineered for visual consistency, gamified progression, and aesthetic delight.**
 
-[![Live Demo](https://img.shields.io/badge/Live_Demo-elualu.vercel.app-10b981?style=flat-square&logo=vercel&logoColor=white)](https://elualu.vercel.app)
 [![React 19](https://img.shields.io/badge/React-19.3-61dafb?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
 [![TypeScript 7](https://img.shields.io/badge/TypeScript-7.0-3178c6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Vite 8](https://img.shields.io/badge/Vite-8.3-646cff?style=flat-square&logo=vite&logoColor=white)](https://vitejs.dev/)
 [![Tailwind CSS v4](https://img.shields.io/badge/Tailwind_CSS-v4.3-38bdf8?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-amber.svg?style=flat-square)](LICENSE)
-
-[**Explore Live Demo »**](https://elualu.vercel.app)
 
 </div>
 
