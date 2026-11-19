@@ -1,6 +1,7 @@
-import { useRef } from 'react'
+import { useMemo, useRef } from 'react'
 import { ChevronLeft, ChevronRight, Download, Plus, Upload } from 'lucide-react'
 import { MONTHS } from '../lib/date'
+import { getHijriDate } from '../lib/hijri'
 import type { Rewards } from '../lib/rewards'
 import type { ThemeState } from '../lib/theme'
 import { LevelChip } from './Rewards'
@@ -32,6 +33,8 @@ export function Header({
   onImport: (file: File) => void
 }) {
   const fileRef = useRef<HTMLInputElement>(null)
+  const noor = theme.style === 'noor'
+  const hijriMonth = useMemo(() => getHijriDate(new Date(year, month, 15)), [year, month])
 
   return (
     <header className="rise relative z-30 flex flex-wrap items-center gap-x-6 gap-y-4">
@@ -54,9 +57,17 @@ export function Header({
         <button className="icon-btn" onClick={onPrev} aria-label="Previous month">
           <ChevronLeft size={20} />
         </button>
-        <h1 className="min-w-[230px] text-center font-display text-[28px] font-extrabold tracking-tight">
-          {MONTHS[month]} <span className="text-ink-3">{year}</span>
-        </h1>
+        <div className="flex min-w-[230px] flex-col items-center">
+          <h1 className="text-center font-display text-[26px] sm:text-[28px] font-extrabold tracking-tight leading-tight">
+            {MONTHS[month]} <span className="text-ink-3">{year}</span>
+          </h1>
+          {noor && (
+            <div className="mt-0.5 inline-flex items-center gap-1.5 rounded-full border border-(--line) bg-surface-2/65 px-2.5 py-0.5 text-[11px] font-bold text-(--gold) shadow-xs transition-all duration-300">
+              <span className="text-[10px]">🌙</span>
+              <span>{hijriMonth.monthYear}</span>
+            </div>
+          )}
+        </div>
         <button className="icon-btn" onClick={onNext} aria-label="Next month">
           <ChevronRight size={20} />
         </button>

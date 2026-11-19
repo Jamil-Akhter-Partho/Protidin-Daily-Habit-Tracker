@@ -6,6 +6,7 @@ import '@fontsource-variable/nunito'
 import '@fontsource-variable/fredoka'
 import './index.css'
 import './garden.css'
+import './noor.css'
 import App from './App'
 
 createRoot(document.getElementById('root')!).render(

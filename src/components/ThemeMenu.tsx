@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
-import { Check, Flower2, LayoutGrid, Monitor, Moon, MoonStar, Palette, Sun, type LucideIcon } from 'lucide-react'
+import { Check, Flower2, LayoutGrid, Monitor, Moon, MoonStar, Palette, Sparkles, Sun, type LucideIcon } from 'lucide-react'
 import { BLOOMS, type StyleChoice, type ThemeChoice, type ThemeState } from '../lib/theme'
 
 const STYLE_OPTIONS: { value: StyleChoice; label: string; hint: string; Icon: LucideIcon }[] = [
   { value: 'classic', label: 'Classic', hint: 'Colourful weeks', Icon: LayoutGrid },
   { value: 'garden', label: 'Garden', hint: 'Grow a tree a day', Icon: Flower2 },
+  { value: 'noor', label: 'Noor', hint: 'Illuminate days', Icon: Sparkles },
 ]
 
 const THEME_OPTIONS: { value: ThemeChoice; label: string; Icon: LucideIcon }[] = [
@@ -57,12 +58,12 @@ export function ThemeMenu({ theme }: { theme: ThemeState }) {
         <div
           role="dialog"
           aria-label="Appearance"
-          className="menu-pop absolute right-0 top-[46px] z-30 w-[292px] space-y-3 rounded-3xl border border-line bg-surface p-3"
+          className="menu-pop absolute right-0 top-[46px] z-30 w-[326px] space-y-3 rounded-3xl border border-line bg-surface p-3"
           style={{ boxShadow: 'var(--shadow-pop)' }}
         >
           <div>
             <Label>Style</Label>
-            <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Style">
+            <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Style">
               {STYLE_OPTIONS.map(({ value, label, hint, Icon }) => {
                 const on = theme.style === value
                 return (
@@ -71,14 +72,14 @@ export function ThemeMenu({ theme }: { theme: ThemeState }) {
                     role="radio"
                     aria-checked={on}
                     onClick={(e) => theme.setStyle(value, e.currentTarget)}
-                    className={`relative rounded-2xl border p-3 text-left transition ${
+                    className={`relative rounded-2xl border p-2.5 text-left transition ${
                       on ? 'border-accent bg-surface-2' : 'border-line hover:bg-surface-2'
                     }`}
                   >
-                    <Icon size={20} className={on ? 'text-accent' : 'text-ink-2'} />
-                    <span className="mt-2 block text-[13px] font-bold">{label}</span>
-                    <span className="block text-[11.5px] text-ink-3">{hint}</span>
-                    {on && <Check size={15} className="absolute right-2.5 top-2.5 text-good" />}
+                    <Icon size={18} className={on ? 'text-accent' : 'text-ink-2'} />
+                    <span className="mt-1.5 block text-[12.5px] font-bold leading-tight">{label}</span>
+                    <span className="mt-0.5 block text-[10.5px] leading-tight text-ink-3">{hint}</span>
+                    {on && <Check size={13} className="absolute right-2 top-2 text-good" />}
                   </button>
                 )
               })}

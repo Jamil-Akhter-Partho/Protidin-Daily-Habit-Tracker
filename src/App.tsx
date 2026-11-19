@@ -3,6 +3,7 @@ import { Confetti, Floaters, RewardPopup, type CelebrationEvent, type Floater } 
 import { WeekdayChart, WeeklyDonuts } from './components/Charts'
 import { RhythmChart } from './components/RhythmChart'
 import { GardenHero, WeekdayFlower, WeeklyBlooms } from './components/Garden'
+import { NoorHero, MinaretChart, WeeklyHilals } from './components/Noor'
 import { HabitGrid } from './components/HabitGrid'
 import { HabitModal } from './components/HabitModal'
 import { Header } from './components/Header'
@@ -31,6 +32,11 @@ export default function App() {
   const seq = useRef(0)
   const theme = useTheme()
   const garden = theme.style === 'garden'
+  const noor = theme.style === 'noor'
+  const activeTheme: 'light' | 'dark' | 'night' =
+    theme.choice === 'system'
+      ? (typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+      : theme.choice
 
   const stats = useMemo(() => monthStats(state, view.y, view.m, today), [state, view, today])
   const rewards = useMemo(() => computeRewards(state), [state])
@@ -162,12 +168,25 @@ export default function App() {
           month={view.m}
           today={today}
         />
+      ) : noor ? (
+        <NoorHero
+          key={`noor-${view.y}-${view.m}`}
+          activeTheme={activeTheme}
+          stats={stats}
+          state={state}
+          todayDone={todayDone}
+          isCurrentMonth={isCurrentMonth}
+          year={view.y}
+          month={view.m}
+          today={today}
+        />
       ) : (
         <StatCards stats={stats} todayDone={todayDone} habitCount={state.habits.length} />
       )}
 
       <HabitGrid
         garden={garden}
+        noor={noor}
         stats={stats}
         checks={state.checks}
         year={view.y}
@@ -185,6 +204,11 @@ export default function App() {
           <WeekdayFlower stats={stats} />
           <WeeklyBlooms stats={stats} month={view.m} className="xl:col-span-2" />
         </div>
+      ) : noor ? (
+        <div className="grid gap-5 xl:grid-cols-3" key={`n-${view.y}-${view.m}`}>
+          <MinaretChart stats={stats} />
+          <WeeklyHilals stats={stats} month={view.m} className="xl:col-span-2" />
+        </div>
       ) : (
         <>
           <div className="grid gap-5 xl:grid-cols-3" key={`${view.y}-${view.m}`}>
@@ -194,7 +218,7 @@ export default function App() {
           <WeeklyDonuts stats={stats} month={view.m} />
         </>
       )}
-      <RewardsPanel rewards={rewards} garden={garden} />
+      <RewardsPanel rewards={rewards} garden={garden} noor={noor} />
 
       <footer className="pb-4 pt-1 text-center text-[12px] text-ink-3">
         Your data is saved in this browser only. Use Backup to keep a copy.

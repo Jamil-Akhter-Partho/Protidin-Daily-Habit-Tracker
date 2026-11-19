@@ -1,0 +1,351 @@
+/* =====================================================================
+   NOOR STYLE (نُور / নূর)
+   Islamic Aesthetic Style (data-style="noor"):
+   - Light: The Royal Islamic Mihrab (Deep Emerald Green & Royal Gold)
+   - Dark: The Golden Calligraphy (Pure Onyx Black & Antique Gold)
+   - Night: The Peaceful Night (Deep Midnight Navy, Stars & Crescent Moon)
+   ===================================================================== */
+
+/* ---------------------------------------------------------------------
+   1. LIGHT THEME — The Royal Islamic Mihrab
+   --------------------------------------------------------------------- */
+:root[data-style="noor"] {
+  --ff-sans: "Inter Variable", "Nunito Variable", system-ui, sans-serif;
+  --ff-display: "Bricolage Grotesque Variable", "Fredoka Variable", sans-serif;
+  --radius-card: 26px;
+
+  /* Islamic Jewel Tone Week Accents */
+  --w1: #d97706; --w1-soft: rgba(217, 119, 6, 0.16); --w1-line: rgba(217, 119, 6, 0.38); --w1-deep: #fef08a;
+  --w2: #0d9488; --w2-soft: rgba(13, 148, 136, 0.16); --w2-line: rgba(13, 148, 136, 0.38); --w2-deep: #ccfbf1;
+  --w3: #be123c; --w3-soft: rgba(190, 18, 60, 0.16); --w3-line: rgba(190, 18, 60, 0.38); --w3-deep: #ffe4e6;
+  --w4: #059669; --w4-soft: rgba(5, 150, 105, 0.16); --w4-line: rgba(5, 150, 105, 0.38); --w4-deep: #d1fae5;
+  --w5: #7c3aed; --w5-soft: rgba(124, 58, 237, 0.16); --w5-line: rgba(124, 58, 237, 0.38); --w5-deep: #ede9fe;
+  --on-wk: #ffffff;
+
+  /* Primary Emerald Canvas & Golden Accents */
+  --bg: #04261b;
+  --surface: #07392a;
+  --surface-2: #0b4937;
+  --ink: #fef9c3;
+  --ink-2: #fef08a;
+  --ink-3: #ca8a04;
+  --line: rgba(234, 179, 8, 0.24);
+  --accent: #d4af37;
+  --on-accent: #031c14;
+  --panel: #052c20;
+  --gold: #facc15;
+  --good: #10b981;
+  --flame: #f59e0b;
+
+  --noor-glow: rgba(212, 175, 55, 0.28);
+  --noor-gold-subtle: rgba(250, 204, 21, 0.12);
+  --shadow-card: 0 4px 20px -6px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(212, 175, 55, 0.18);
+}
+
+/* ---------------------------------------------------------------------
+   2. DARK THEME — The Golden Calligraphy
+   --------------------------------------------------------------------- */
+:root[data-style="noor"][data-theme="dark"] {
+  --w1: #f59e0b; --w1-soft: rgba(245, 158, 11, 0.15); --w1-line: rgba(245, 158, 11, 0.32); --w1-deep: #fef08a;
+  --w2: #14b8a6; --w2-soft: rgba(20, 184, 166, 0.15); --w2-line: rgba(20, 184, 166, 0.32); --w2-deep: #99f6e4;
+  --w3: #f43f5e; --w3-soft: rgba(244, 63, 94, 0.15); --w3-line: rgba(244, 63, 94, 0.32); --w3-deep: #fecdd3;
+  --w4: #10b981; --w4-soft: rgba(16, 185, 129, 0.15); --w4-line: rgba(16, 185, 129, 0.32); --w4-deep: #a7f3d0;
+  --w5: #8b5cf6; --w5-soft: rgba(139, 92, 246, 0.15); --w5-line: rgba(139, 92, 246, 0.32); --w5-deep: #ddd6fe;
+  --on-wk: #0a0a0c;
+
+  --bg: #09090b;
+  --surface: #121217;
+  --surface-2: #191921;
+  --ink: #ffffff;
+  --ink-2: #fef08a;
+  --ink-3: #94a3b8;
+  --line: rgba(245, 158, 11, 0.22);
+  --accent: #f59e0b;
+  --on-accent: #09090b;
+  --panel: #16161c;
+  --gold: #fbbf24;
+
+  --noor-glow: rgba(245, 158, 11, 0.25);
+  --noor-gold-subtle: rgba(245, 158, 11, 0.08);
+  --shadow-card: 0 4px 24px -8px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(245, 158, 11, 0.22);
+}
+
+/* ---------------------------------------------------------------------
+   3. NIGHT THEME — The Peaceful Night
+   --------------------------------------------------------------------- */
+:root[data-style="noor"][data-theme="night"] {
+  --w1: #eab308; --w1-soft: rgba(234, 179, 8, 0.14); --w1-line: rgba(234, 179, 8, 0.3); --w1-deep: #fef08a;
+  --w2: #38bdf8; --w2-soft: rgba(56, 189, 248, 0.14); --w2-line: rgba(56, 189, 248, 0.3); --w2-deep: #bae6fd;
+  --w3: #fb7185; --w3-soft: rgba(251, 113, 133, 0.14); --w3-line: rgba(251, 113, 133, 0.3); --w3-deep: #ffe4e6;
+  --w4: #34d399; --w4-soft: rgba(52, 211, 153, 0.14); --w4-line: rgba(52, 211, 153, 0.3); --w4-deep: #a7f3d0;
+  --w5: #a78bfa; --w5-soft: rgba(167, 139, 250, 0.14); --w5-line: rgba(167, 139, 250, 0.3); --w5-deep: #ede9fe;
+  --on-wk: #020617;
+
+  --bg: #030712;
+  --surface: #061124;
+  --surface-2: #0b1a36;
+  --ink: #f8fafc;
+  --ink-2: #e2e8f0;
+  --ink-3: #94a3b8;
+  --line: rgba(147, 197, 253, 0.2);
+  --accent: #facc15;
+  --on-accent: #020617;
+  --panel: #08162e;
+  --gold: #facc15;
+
+  --noor-glow: rgba(250, 204, 21, 0.32);
+  --noor-gold-subtle: rgba(56, 189, 248, 0.1);
+  --shadow-card: 0 4px 28px -8px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(147, 197, 253, 0.2);
+}
+
+/* ---------------------------------------------------------------------
+   NOOR GLOBAL BODY BACKGROUNDS & ILLUMINATION
+   --------------------------------------------------------------------- */
+:root[data-style="noor"] body {
+  background:
+    radial-gradient(1100px 520px at 50% -8%, var(--noor-glow), transparent 70%),
+    radial-gradient(900px 450px at 92% 105%, var(--noor-gold-subtle), transparent 60%),
+    var(--bg);
+  background-attachment: fixed;
+}
+
+:root[data-style="noor"] .btn-primary {
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 800;
+  border-radius: 999px;
+  box-shadow: 0 4px 14px -3px var(--accent);
+}
+
+:root[data-style="noor"] .btn-primary:hover {
+  filter: brightness(1.1);
+}
+
+:root[data-style="noor"] .card {
+  border-color: var(--line);
+  box-shadow: var(--shadow-card);
+}
+
+/* ---------------------------------------------------------------------
+   NOOR KEYFRAMES & MICRO-ANIMATIONS
+   --------------------------------------------------------------------- */
+@keyframes noorArchPulse {
+  0%, 100% { transform: scale(0.992); opacity: 0.94; }
+  50% { transform: scale(1.008); opacity: 1; filter: drop-shadow(0 0 16px rgba(250, 204, 21, 0.45)); }
+}
+
+@keyframes noorMoonGlow {
+  0%, 100% { filter: drop-shadow(0 0 10px rgba(250, 204, 21, 0.4)); }
+  50% { filter: drop-shadow(0 0 22px rgba(250, 204, 21, 0.85)); }
+}
+
+@keyframes noorStarTwinkle {
+  0%, 100% { opacity: 0.2; transform: scale(0.65); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+@keyframes noorLanternSway {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+}
+
+.noor-arch-pulse { animation: noorArchPulse 5.5s ease-in-out infinite; }
+.noor-moon-glow { animation: noorMoonGlow 4.2s ease-in-out infinite; }
+.noor-star { animation: noorStarTwinkle 2.8s ease-in-out infinite; }
+.noor-lantern { animation: noorLanternSway 3.6s ease-in-out infinite; transform-origin: top center; }
+
+/* ---------------------------------------------------------------------
+   NOOR HABIT MATRIX & BARAKAH CELLS
+   --------------------------------------------------------------------- */
+:root[data-style="noor"] .wkhead {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-bottom: 0;
+  border-radius: 18px 18px 0 0;
+  color: var(--ink);
+  box-shadow: 0 4px 12px -4px var(--line);
+}
+
+:root[data-style="noor"] .wkblock {
+  border-color: var(--line);
+}
+
+:root[data-style="noor"] .box {
+  border-radius: 8px;
+  border: 1.5px solid var(--line);
+  background: var(--surface);
+  transition: transform 0.2s cubic-bezier(0.3, 1.6, 0.5, 1), background 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+:root[data-style="noor"] .cell:hover:not(:disabled) .box {
+  border-color: var(--accent);
+  transform: scale(1.16);
+  box-shadow: 0 0 10px var(--noor-glow);
+}
+
+:root[data-style="noor"] .cell[aria-checked="true"] .box {
+  background: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 0 12px var(--noor-glow);
+}
+
+:root[data-style="noor"] .cell[aria-checked="true"] .box svg {
+  stroke: var(--on-accent);
+  stroke-width: 3.2;
+}
+
+:root[data-style="noor"] .cell.is-today .box {
+  border-color: var(--gold);
+  border-width: 2px;
+  box-shadow: 0 0 8px var(--gold);
+}
+
+:root[data-style="noor"] .hrow {
+  border-color: var(--line);
+}
+
+/* ---------------------------------------------------------------------
+   NOOR BARAKAH & ISTIQAMAH PILLAR (SUMMARY COLUMN)
+   --------------------------------------------------------------------- */
+@keyframes noorGoldShimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+:root[data-style="noor"] .shimmer-gold {
+  background: linear-gradient(90deg, #d97706 0%, #facc15 25%, #fef08a 50%, #facc15 75%, #d97706 100%);
+  background-size: 200% 100%;
+  animation: noorGoldShimmer 3.2s infinite linear;
+}
+
+:root[data-style="noor"] .shimmer-done {
+  background: linear-gradient(90deg, #059669 0%, #10b981 30%, #facc15 50%, #10b981 70%, #059669 100%);
+  background-size: 200% 100%;
+  animation: noorGoldShimmer 2.5s infinite linear;
+}
+
+/* Light Theme (The Royal Islamic Mihrab - Deep Emerald & Royal Gold) */
+:root[data-style="noor"] .sum-block {
+  background: #07392a;
+  border-left: 1px solid var(--line);
+  border-right: 3px solid var(--accent);
+  box-shadow: 0 4px 16px -3px var(--noor-glow);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+:root[data-style="noor"] .sum-head {
+  border-top: 3px solid var(--accent);
+  background: #0b4937;
+  color: var(--ink);
+  overflow: hidden;
+}
+
+:root[data-style="noor"] .sum-foot {
+  border-bottom: 2px solid var(--line);
+  background: #0b4937;
+}
+
+:root[data-style="noor"] .hrow:hover .sum-row {
+  background: #0b4937;
+  box-shadow: 0 0 16px -2px var(--noor-glow);
+}
+
+:root[data-style="noor"] .noor-niyyah-badge {
+  background: rgba(4, 38, 27, 0.75);
+  border: 1px solid var(--line);
+  color: var(--ink);
+}
+
+:root[data-style="noor"] .noor-istiqamah-badge {
+  background: rgba(212, 175, 55, 0.2);
+  border: 1px solid rgba(212, 175, 55, 0.55);
+  color: var(--gold);
+  box-shadow: 0 0 10px rgba(250, 204, 21, 0.35);
+}
+
+:root[data-style="noor"] .noor-sum-pill {
+  background: rgba(212, 175, 55, 0.2);
+  border: 1px solid rgba(212, 175, 55, 0.45);
+  color: var(--gold);
+}
+
+/* Dark Theme (The Golden Calligraphy - Pure Onyx & Antique Gold) */
+:root[data-style="noor"][data-theme="dark"] .sum-block {
+  background: #121217;
+  border-left: 1px solid var(--line);
+  border-right: 3px solid var(--accent);
+  box-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.8);
+}
+
+:root[data-style="noor"][data-theme="dark"] .sum-head {
+  border-top: 3px solid var(--accent);
+  background: #191921;
+}
+
+:root[data-style="noor"][data-theme="dark"] .sum-foot {
+  border-bottom: 2px solid var(--line);
+  background: #191921;
+}
+
+:root[data-style="noor"][data-theme="dark"] .hrow:hover .sum-row {
+  background: #191921;
+}
+
+:root[data-style="noor"][data-theme="dark"] .noor-niyyah-badge {
+  background: #09090b;
+  border: 1px solid var(--line);
+  color: #ffffff;
+}
+
+:root[data-style="noor"][data-theme="dark"] .noor-istiqamah-badge {
+  background: rgba(245, 158, 11, 0.2);
+  border: 1px solid rgba(245, 158, 11, 0.5);
+  color: var(--gold);
+}
+
+:root[data-style="noor"][data-theme="dark"] .noor-sum-pill {
+  background: rgba(245, 158, 11, 0.2);
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  color: var(--gold);
+}
+
+/* Night Theme (The Peaceful Night - Deep Midnight Navy & Celestial Starlight) */
+:root[data-style="noor"][data-theme="night"] .sum-block {
+  background: #061124;
+  border-left: 1px solid var(--line);
+  border-right: 3px solid var(--accent);
+  box-shadow: 0 4px 24px -4px rgba(0, 0, 0, 0.9);
+}
+
+:root[data-style="noor"][data-theme="night"] .sum-head {
+  border-top: 3px solid var(--accent);
+  background: #0b1a36;
+}
+
+:root[data-style="noor"][data-theme="night"] .sum-foot {
+  border-bottom: 2px solid var(--line);
+  background: #0b1a36;
+}
+
+:root[data-style="noor"][data-theme="night"] .hrow:hover .sum-row {
+  background: #0b1a36;
+}
+
+:root[data-style="noor"][data-theme="night"] .noor-niyyah-badge {
+  background: #030712;
+  border: 1px solid var(--line);
+  color: #f8fafc;
+}
+
+:root[data-style="noor"][data-theme="night"] .noor-istiqamah-badge {
+  background: rgba(250, 204, 21, 0.2);
+  border: 1px solid rgba(250, 204, 21, 0.5);
+  color: var(--gold);
+}
+
+:root[data-style="noor"][data-theme="night"] .noor-sum-pill {
+  background: rgba(250, 204, 21, 0.2);
+  border: 1px solid rgba(250, 204, 21, 0.45);
+  color: var(--gold);
+}

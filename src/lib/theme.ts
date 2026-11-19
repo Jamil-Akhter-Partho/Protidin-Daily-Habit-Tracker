@@ -3,11 +3,11 @@ import { flushSync } from 'react-dom'
 import { prefersReducedMotion } from './hooks'
 
 export type ThemeChoice = 'system' | 'light' | 'dark' | 'night'
-export type StyleChoice = 'classic' | 'garden'
+export type StyleChoice = 'classic' | 'garden' | 'noor'
 export type BloomChoice = 'pink' | 'lavender' | 'peach' | 'mint' | 'sky'
 
 export const THEMES: ThemeChoice[] = ['system', 'light', 'dark', 'night']
-export const STYLES: StyleChoice[] = ['classic', 'garden']
+export const STYLES: StyleChoice[] = ['classic', 'garden', 'noor']
 /** Bloom colours and their hue angle (also set in garden.css). */
 export const BLOOMS: { value: BloomChoice; label: string; hue: number }[] = [
   { value: 'pink', label: 'Pink', hue: 352 },

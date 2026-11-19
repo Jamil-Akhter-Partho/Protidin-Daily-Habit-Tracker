@@ -243,7 +243,132 @@ function BadgeBloom({ unlocked, xp, index, Icon }: { unlocked: boolean; xp: numb
   )
 }
 
-export function RewardsPanel({ rewards, garden = false }: { rewards: Rewards; garden?: boolean }) {
+function NoorRosette({ level }: { level: number; progress: number }) {
+  return (
+    <div className="relative size-[104px] shrink-0 flex items-center justify-center">
+      <svg viewBox="0 0 100 100" className="size-full overflow-visible" aria-hidden="true">
+        {/* Ambient Noor Aura */}
+        <circle cx="50" cy="50" r="46" fill="var(--accent)" fillOpacity="0.14" className="noor-moon-glow" />
+
+        {/* 8-Point Rub el Hizb Star Frame */}
+        <g className="noor-arch-pulse" style={{ transformOrigin: '50px 50px' }}>
+          <rect
+            x="16"
+            y="16"
+            width="68"
+            height="68"
+            rx="12"
+            fill="none"
+            stroke="var(--gold)"
+            strokeWidth="1.8"
+            strokeOpacity="0.9"
+          />
+          <rect
+            x="16"
+            y="16"
+            width="68"
+            height="68"
+            rx="12"
+            fill="none"
+            stroke="var(--gold)"
+            strokeWidth="1.8"
+            strokeOpacity="0.9"
+            transform="rotate(45 50 50)"
+          />
+        </g>
+
+        {/* Center Sanctuary Dial */}
+        <circle cx="50" cy="50" r="26" fill="var(--panel)" stroke="var(--accent)" strokeWidth="1.8" />
+      </svg>
+      <div className="absolute inset-0 grid place-items-center pointer-events-none">
+        <div className="text-center leading-none">
+          <div className="text-[9px] font-extrabold uppercase tracking-widest text-(--accent)">Tier</div>
+          <div className="num font-display text-[26px] font-black text-ink">{level}</div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function StatNoor({ kind }: { kind: 'ticks' | 'streak' | 'perfect' }) {
+  if (kind === 'ticks') {
+    return (
+      <svg width="14" height="14" viewBox="0 0 16 16" className="shrink-0" aria-hidden="true">
+        <path d="M 8,2 A 6,6 0 1 0 14,8 A 5,5 0 1 1 8,2 Z" fill="var(--accent)" />
+      </svg>
+    )
+  }
+  if (kind === 'streak') {
+    return (
+      <svg width="14" height="14" viewBox="0 0 16 16" className="shrink-0 text-(--gold)" aria-hidden="true">
+        <path
+          d="M 8,1 L 9.6,5.4 L 14.2,5.7 L 10.6,8.7 L 11.8,13.2 L 8,10.6 L 4.2,13.2 L 5.4,8.7 L 1.8,5.7 L 6.4,5.4 Z"
+          fill="var(--gold)"
+        />
+      </svg>
+    )
+  }
+  return (
+    <svg width="14" height="14" viewBox="0 0 16 16" className="shrink-0 text-(--accent)" aria-hidden="true">
+      <circle cx="8" cy="8" r="6" fill="none" stroke="var(--accent)" strokeWidth="1.5" />
+      <circle cx="8" cy="8" r="3" fill="var(--gold)" />
+    </svg>
+  )
+}
+
+function BadgeNoor({
+  unlocked,
+  Icon,
+}: {
+  unlocked: boolean
+  Icon: LucideIcon
+}) {
+  if (!unlocked) {
+    return (
+      <div className="relative grid size-12 shrink-0 place-items-center">
+        <svg viewBox="0 0 48 48" className="size-full overflow-visible" aria-hidden="true">
+          <path
+            d="M 12,44 V 22 C 12,12 20,6 24,4 C 28,6 36,12 36,22 V 44 Z"
+            fill="var(--surface-2)"
+            stroke="var(--line)"
+            strokeWidth="1.4"
+            opacity="0.65"
+          />
+        </svg>
+        <span className="absolute inset-0 grid place-items-center text-ink-3">
+          <Lock size={15} strokeWidth={2.2} />
+        </span>
+      </div>
+    )
+  }
+
+  return (
+    <div className="noor-moon-glow relative grid size-12 shrink-0 place-items-center">
+      <svg viewBox="0 0 48 48" className="absolute inset-0 size-full overflow-visible" aria-hidden="true">
+        <path
+          d="M 10,44 V 22 C 10,11 19,5 24,3 C 29,5 38,11 38,22 V 44 Z"
+          fill="var(--surface)"
+          stroke="var(--accent)"
+          strokeWidth="1.8"
+        />
+        <path
+          d="M 13,44 V 23 C 13,13 20,8 24,6 C 28,8 35,13 35,23 V 44 Z"
+          fill="none"
+          stroke="var(--gold)"
+          strokeWidth="0.8"
+          strokeDasharray="2.5 2"
+          opacity="0.85"
+        />
+        <circle cx="24" cy="3" r="1.8" fill="var(--gold)" className="noor-star" />
+      </svg>
+      <span className="relative z-1 grid size-6 place-items-center" style={{ color: 'var(--accent)' }}>
+        <Icon size={16} strokeWidth={2.4} />
+      </span>
+    </div>
+  )
+}
+
+export function RewardsPanel({ rewards, garden = false, noor = false }: { rewards: Rewards; garden?: boolean; noor?: boolean }) {
   const xp = useCountUp(rewards.xp)
   const toNext = rewards.levelSize - rewards.intoLevel
   const facts: { key: 'ticks' | 'streak' | 'perfect'; label: string; value: number }[] = [
@@ -290,6 +415,8 @@ export function RewardsPanel({ rewards, garden = false }: { rewards: Rewards; ga
             <div className="mt-4 flex items-center gap-4">
               {garden ? (
                 <LevelWreath level={rewards.level} progress={rewards.intoLevel / rewards.levelSize} />
+              ) : noor ? (
+                <NoorRosette level={rewards.level} progress={rewards.intoLevel / rewards.levelSize} />
               ) : (
                 <ChronometerDial
                   value={rewards.levelSize > 0 ? rewards.intoLevel / rewards.levelSize : 0}
@@ -333,6 +460,7 @@ export function RewardsPanel({ rewards, garden = false }: { rewards: Rewards; ga
                 <div key={f.label} className="rounded-xl border border-white/10 bg-white/5 p-2 text-center transition-colors hover:bg-white/10">
                   <div className="flex items-center justify-center gap-1">
                     {garden && <StatFlora kind={f.key} />}
+                    {noor && <StatNoor kind={f.key} />}
                     <div className={`num font-display text-[18px] font-black leading-tight ${
                       f.key === 'streak' ? 'text-gold' : f.key === 'perfect' ? 'text-good' : 'text-white'
                     }`}>
@@ -376,6 +504,39 @@ export function RewardsPanel({ rewards, garden = false }: { rewards: Rewards; ga
                       {b.desc}
                     </div>
                     <div className={`num mt-0.5 text-[11px] font-bold ${on ? 'text-(--wk-deep)' : 'text-ink-3'}`}>+{b.xp} XP</div>
+                  </div>
+                </div>
+              )
+            }
+
+            if (noor) {
+              return (
+                <div
+                  key={b.id}
+                  className={`badge-tile flex items-center gap-3 rounded-2xl border p-3 transition-all duration-300 hover:scale-[1.02] ${
+                    on
+                      ? 'is-unlocked border-(--accent)/50 bg-(--surface) shadow-sm'
+                      : 'border-line/40 bg-surface-2/60 opacity-70 hover:opacity-100 hover:border-line'
+                  }`}
+                  style={{
+                    ['--i' as string]: i,
+                    boxShadow: on ? '0 4px 18px -4px var(--halo)' : undefined,
+                  }}
+                >
+                  <BadgeNoor unlocked={on} Icon={Icon} />
+                  <div className="min-w-0 flex-1">
+                    <div className={`truncate text-[13px] font-bold ${on ? 'text-ink' : 'text-ink-2'}`}>{b.name}</div>
+                    <div className={`truncate text-[11px] ${on ? 'text-ink-3' : 'text-ink-3/70'}`} title={b.desc}>
+                      {b.desc}
+                    </div>
+                    <div className="num mt-0.5 flex items-center justify-between text-[11px] font-bold">
+                      <span className={on ? 'text-(--gold)' : 'text-ink-3'}>+{b.xp} XP</span>
+                      {!on && (
+                        <span className="text-[10px] text-ink-3/80">
+                          {Math.round(progress * 100)}%
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
               )

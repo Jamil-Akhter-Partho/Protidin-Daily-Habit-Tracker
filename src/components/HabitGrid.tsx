@@ -3,6 +3,7 @@ import { dateKey, MONTHS, WEEKDAY_LETTERS, type Today } from '../lib/date'
 import type { MonthStats } from '../lib/stats'
 import { ck, type Habit, type State } from '../lib/store'
 import { Plant, plantStage } from './Plant'
+import { NoorLantern } from './Noor'
 
 export function HabitGrid({
   stats,
@@ -15,9 +16,12 @@ export function HabitGrid({
   onMove,
   onAdd,
   garden = false,
+  noor = false,
 }: {
   /** Garden style: show a plant above each day that grows with that day's progress. */
   garden?: boolean
+  /** Noor style: show a glowing barakah lantern above each day. */
+  noor?: boolean
   stats: MonthStats
   checks: State['checks']
   year: number
@@ -68,6 +72,25 @@ export function HabitGrid({
           </div>
         )}
 
+        {noor && (
+          <div className="hgrid" style={style} aria-hidden="true">
+            <div className="flex items-end pb-2 pl-2 text-[12px] font-extrabold text-(--accent)">
+              ✨ Barakah
+            </div>
+            {weeks.map((w) => (
+              <div key={w.index} className="grid" style={inner(w.end - w.start + 1)}>
+                {days(w.start, w.end).map((d) => (
+                  <div key={d} className="plant-slot">
+                    {dateKey(year, month, d) <= today.key && (
+                      <NoorLantern stage={plantStage(perDay[d - 1], habitCount)} size={38} />
+                    )}
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        )}
+
         {/* header */}
         <div className="hgrid" style={style}>
           <div className="hab-head flex flex-col justify-between">
@@ -109,10 +132,35 @@ export function HabitGrid({
               })}
             </div>
           ))}
-          <div className="sum-block sum-head grid grid-cols-[62px_1fr_50px] items-center px-1 text-center">
-            <div className="pb-1 text-[11px] font-extrabold uppercase tracking-wider text-ink-2">Goal</div>
-            <div className="pb-1 text-[11px] font-extrabold uppercase tracking-wider text-ink-2">Progress</div>
-            <div className="pb-1 text-[11px] font-extrabold uppercase tracking-wider text-ink-2">Streak</div>
+          <div
+            className={`sum-block sum-head grid items-center px-1 text-center ${
+              noor
+                ? 'grid-cols-[66px_1fr_64px] noor-sum-head overflow-hidden py-1'
+                : 'grid-cols-[62px_1fr_50px]'
+            }`}
+          >
+            {noor ? (
+              <>
+                <div className="flex flex-col items-center justify-center">
+                  <span className="text-[12px] leading-none">🎯</span>
+                  <span className="mt-0.5 text-[9.5px] font-extrabold uppercase tracking-tight text-ink-2">Niyyah</span>
+                </div>
+                <div className="flex flex-col items-center justify-center">
+                  <span className="text-[12px] leading-none">✨</span>
+                  <span className="mt-0.5 text-[9.5px] font-extrabold uppercase tracking-tight text-ink-2">Radiance</span>
+                </div>
+                <div className="flex flex-col items-center justify-center">
+                  <span className="text-[12px] leading-none">🔥</span>
+                  <span className="mt-0.5 text-[9.5px] font-extrabold uppercase tracking-tight text-ink-2">Istiqamah</span>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="pb-1 text-[11px] font-extrabold uppercase tracking-wider text-ink-2">Goal</div>
+                <div className="pb-1 text-[11px] font-extrabold uppercase tracking-wider text-ink-2">Progress</div>
+                <div className="pb-1 text-[11px] font-extrabold uppercase tracking-wider text-ink-2">Streak</div>
+              </>
+            )}
           </div>
         </div>
 
@@ -170,33 +218,53 @@ export function HabitGrid({
               </div>
             ))}
 
-            <div className="sum-block sum-row grid grid-cols-[62px_1fr_50px] items-center px-1.5 py-1">
+            <div
+              className={`sum-block sum-row grid items-center px-1.5 py-1 ${
+                noor ? 'grid-cols-[66px_1fr_64px] noor-sum-row' : 'grid-cols-[62px_1fr_50px]'
+              }`}
+            >
               <div className="num flex items-center justify-center">
-                <span className="goal-badge text-[12px] font-bold">
+                <span className={`goal-badge text-[12px] font-bold ${noor ? 'noor-niyyah-badge' : ''}`}>
                   {done}<span className="text-[10.5px] opacity-60">/{goal}</span>
                 </span>
               </div>
               <div className="flex flex-col justify-center px-2 min-w-0">
                 <div className="bar-track h-2 w-full overflow-hidden rounded-full bg-black/20 dark:bg-white/10">
                   <div
-                    className={`bar-fill h-full rounded-full transition-all duration-500 ${pct >= 1 ? 'is-done' : ''}`}
+                    className={`bar-fill h-full rounded-full transition-all duration-500 ${
+                      noor
+                        ? pct >= 1
+                          ? 'shimmer-done'
+                          : 'shimmer-gold'
+                        : pct >= 1
+                          ? 'is-done'
+                          : ''
+                    }`}
                     style={{
                       width: `${Math.min(100, Math.round(pct * 100))}%`,
-                      background: pct >= 1
-                        ? 'linear-gradient(90deg, #10b981 0%, #34d399 100%)'
-                        : 'linear-gradient(90deg, #3b82f6 0%, #06b6d4 100%)',
-                      boxShadow: pct >= 1
-                        ? '0 0 10px rgba(16, 185, 129, 0.45)'
-                        : '0 0 8px rgba(6, 182, 212, 0.35)',
+                      background: noor
+                        ? undefined
+                        : pct >= 1
+                          ? 'linear-gradient(90deg, #10b981 0%, #34d399 100%)'
+                          : 'linear-gradient(90deg, #3b82f6 0%, #06b6d4 100%)',
+                      boxShadow: noor
+                        ? pct >= 1
+                          ? '0 0 10px rgba(16, 185, 129, 0.45)'
+                          : '0 0 8px rgba(250, 204, 21, 0.4)'
+                        : pct >= 1
+                          ? '0 0 10px rgba(16, 185, 129, 0.45)'
+                          : '0 0 8px rgba(6, 182, 212, 0.35)',
                     }}
                   />
                 </div>
                 <div className="mt-1 flex items-center justify-between text-[10.5px] font-semibold">
-                  <span className={`num font-bold ${pct >= 1 ? 'text-good' : 'text-ink-2'}`}>
+                  <span className={`num font-bold ${pct >= 1 ? (noor ? 'text-(--gold)' : 'text-good') : 'text-ink-2'}`}>
                     {Math.round(pct * 100)}%
                   </span>
                   {pct >= 1 ? (
-                    <span className="text-[9.5px] font-extrabold text-good">Done! ✨</span>
+                    <span className="text-[9.5px] font-extrabold text-good">
+                      {noor ? 'Done! ۞' : 'Done! ✨'}
+                    </span>
                   ) : goal && goal > done ? (
                     <span className="num text-[9.5px] text-ink-3">{goal - done} left</span>
                   ) : null}
@@ -205,7 +273,9 @@ export function HabitGrid({
               <div className="flex items-center justify-center">
                 {streak ? (
                   <span
-                    className="streak-badge inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 text-[11px] font-black"
+                    className={`streak-badge inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 text-[11px] font-black ${
+                      noor ? 'noor-istiqamah-badge' : ''
+                    }`}
                     title={`${streak}-day streak`}
                   >
                     <Flame size={12} fill="currentColor" /> {streak}
@@ -243,10 +313,10 @@ export function HabitGrid({
               })}
             </div>
           ))}
-          <div className="sum-block sum-foot flex items-center justify-center px-2 py-2">
-            <span className="sum-total-pill num inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-bold shadow-xs">
-              <span>{perDay.reduce((a, b) => a + b, 0)}</span>
-              <span className="opacity-75">ticks in {dim}d</span>
+          <div className={`sum-block sum-foot flex items-center justify-center px-2 py-2 ${noor ? 'noor-sum-foot' : ''}`}>
+            <span className={`sum-total-pill num inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-bold shadow-xs ${noor ? 'noor-sum-pill' : ''}`}>
+              <span>{noor ? '۞ ' : ''}{perDay.reduce((a, b) => a + b, 0)}</span>
+              <span className="opacity-75">{noor ? 'deeds' : 'ticks'} in {dim}d</span>
             </span>
           </div>
         </div>
