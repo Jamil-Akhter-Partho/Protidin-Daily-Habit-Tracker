@@ -11,6 +11,7 @@ import { ConfirmDialog } from './components/Modal'
 import { RewardsPanel } from './components/Rewards'
 import { StatCards } from './components/StatCards'
 import { ProfileMenu } from './components/ProfileMenu'
+import { InstallPopup } from './components/InstallPopup'
 import { useToday } from './lib/hooks'
 import { BADGES, computeRewards, XP_PER_CHECK } from './lib/rewards'
 import { monthStats } from './lib/stats'
@@ -257,6 +258,7 @@ export default function App() {
       {queue[0] && <RewardPopup event={queue[0]} onDone={dismissPopup} />}
       <Floaters items={floaters} onDone={removeFloater} />
       <ProfileMenu />
+      <InstallPopup />
 
       {toast && (
         <div className="toast fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-xl border border-white/10 bg-panel px-4 py-2.5 text-[13px] font-semibold text-white shadow-lg" role="status">

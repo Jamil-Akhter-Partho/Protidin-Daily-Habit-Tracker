@@ -39,14 +39,11 @@ export function Header({
   return (
     <header className="rise relative z-30 flex flex-wrap items-center gap-x-6 gap-y-4">
       <div className="flex items-center gap-3">
-        <svg viewBox="0 0 64 64" className="size-11 shrink-0" aria-hidden="true">
-          <rect width="64" height="64" rx="16" fill="var(--ink)" />
-          <rect x="13" y="13" width="16" height="16" rx="5" fill="var(--w1)" />
-          <rect x="35" y="13" width="16" height="16" rx="5" fill="var(--w2)" />
-          <rect x="13" y="35" width="16" height="16" rx="5" fill="var(--w3)" />
-          <rect x="35" y="35" width="16" height="16" rx="5" fill="var(--w4)" />
-          <path d="M39 43.5l3 3 5.5-6" fill="none" stroke="#fff" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
+        <img
+          src="./icons/icon-192.png"
+          alt="Protidin Logo"
+          className="size-11 shrink-0 rounded-2xl shadow-sm object-cover border border-(--line)"
+        />
         <div className="leading-tight">
           <div className="font-display text-[22px] font-extrabold tracking-tight">Protidin</div>
           <div className="text-[12.5px] text-ink-3">Daily habit tracker</div>

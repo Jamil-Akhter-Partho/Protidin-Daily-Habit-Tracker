@@ -15,8 +15,8 @@ const STORAGE_KEY = 'protidin:profile'
 const POS_KEY = 'protidin:profile:pos'
 
 const DEFAULT_PROFILE: UserProfile = {
-  name: 'User',
-  avatar: '👤',
+  name: 'Partho',
+  avatar: 'partho',
 }
 
 const AVATAR_OPTIONS = ['👤', '🌸', '🌿', '⚡', '🌙', '⭐', '🔥', '🎯']
@@ -236,6 +236,8 @@ export function ProfileMenu() {
         >
           {profile.avatar === 'initial' ? (
             <span className="font-extrabold text-[11px] text-accent">{initialLetter}</span>
+          ) : profile.avatar === 'partho' ? (
+            <img src="./icons/icon-192.png" alt="Avatar" className="size-full object-cover rounded-full" />
           ) : (
             <span className="text-[12.5px]">{profile.avatar}</span>
           )}
@@ -269,11 +271,13 @@ export function ProfileMenu() {
           {/* Header */}
           <div className="flex items-center justify-between border-b border-line pb-3">
             <div className="flex items-center gap-2.5">
-              <div className="grid size-10 place-items-center rounded-2xl bg-surface-2 border border-line text-lg select-none">
+              <div className="grid size-10 place-items-center rounded-2xl bg-surface-2 border border-line text-lg select-none overflow-hidden">
                 {draftAvatar === 'initial' ? (
                   <span className="font-extrabold text-base text-accent">
                     {(draftName.trim() ? draftName.trim()[0] : 'U').toUpperCase()}
                   </span>
+                ) : draftAvatar === 'partho' ? (
+                  <img src="./icons/icon-192.png" alt="Avatar" className="size-full object-cover" />
                 ) : (
                   <span>{draftAvatar}</span>
                 )}
@@ -321,6 +325,18 @@ export function ProfileMenu() {
                 Avatar
               </label>
               <div className="flex flex-wrap gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => setDraftAvatar('partho')}
+                  className={`grid size-8 place-items-center rounded-xl border text-[11.5px] font-black transition overflow-hidden p-0.5 ${
+                    draftAvatar === 'partho'
+                      ? 'border-accent bg-accent/20 ring-2 ring-accent'
+                      : 'border-line bg-surface-2 hover:border-ink-3'
+                  }`}
+                  title="Use custom avatar"
+                >
+                  <img src="./icons/icon-192.png" alt="Custom Avatar" className="size-full rounded-lg object-cover" />
+                </button>
                 <button
                   type="button"
                   onClick={() => setDraftAvatar('initial')}
