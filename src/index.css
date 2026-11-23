@@ -555,6 +555,47 @@ body {
 }
 .field:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent); }
 
+/* ---------- mobile heatmap neon wave & flash animations ---------- */
+@keyframes waveDoneFlash {
+  0% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  35% {
+    transform: scale(1.35);
+    filter: brightness(2.2);
+    box-shadow: 0 0 16px currentColor;
+    z-index: 10;
+  }
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+}
+.wave-flash-done {
+  animation: waveDoneFlash 0.75s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes waveMissedRedFlash {
+  0% {
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(1.35);
+    background: #ef4444 !important;
+    border-color: #f87171 !important;
+    box-shadow: 0 0 16px rgba(239, 68, 68, 0.95), inset 0 0 4px #fff;
+    opacity: 1 !important;
+    z-index: 10;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.wave-flash-missed {
+  animation: waveMissedRedFlash 0.75s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
 /* ---------- mobile optimizations ---------- */
 .squircle-tile {
   border-radius: 3.5px;

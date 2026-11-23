@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   CalendarCheck,
   ChevronLeft,
@@ -68,6 +68,14 @@ export function MobileHabitView({
   // View tabs: 'weekly' (default, 7-day bubbles) | 'today' (quick checklist) | 'overall' (5-row squircle heatmap)
   const [activeTab, setActiveTab] = useState<'weekly' | 'today' | 'overall'>('weekly')
 
+  // Left-to-Right Wave Scanner Trigger for Overall tab
+  const [waveKey, setWaveKey] = useState(0)
+  useEffect(() => {
+    if (activeTab === 'overall') {
+      setWaveKey((k) => k + 1)
+    }
+  }, [activeTab])
+
   // Find active week index matching today (if current month), else default to week 0
   const initialWeekIdx = useMemo(() => {
     if (!isCurrentMonth) return 0
@@ -112,10 +120,19 @@ export function MobileHabitView({
       monthIndex: number
       isToday: boolean
       isFuture: boolean
+      globalColIndex: number
     }[] = []
 
-    const weekLabels: { index: number; label: string }[] = []
-    let lastMonth = -1
+    interface MonthGroup {
+      monthIndex: number
+      name: string
+      isCurrent: boolean
+      weekCount: number
+      days: typeof days
+    }
+
+    const monthGroups: MonthGroup[] = []
+    let currentGroup: MonthGroup | null = null
 
     for (let w = 0; w < 13; w++) {
       const weekStartDate = new Date(
@@ -124,9 +141,17 @@ export function MobileHabitView({
         endSaturday.getDate() - (12 - w) * 7 - 6
       )
       const m = weekStartDate.getMonth()
-      if (m !== lastMonth) {
-        weekLabels.push({ index: w, label: MONTHS[m].slice(0, 3) })
-        lastMonth = m
+      if (!currentGroup || currentGroup.monthIndex !== m) {
+        currentGroup = {
+          monthIndex: m,
+          name: MONTHS[m].slice(0, 3), // Clean 3-letter month name (no week count)
+          isCurrent: m === month,
+          weekCount: 1,
+          days: [],
+        }
+        monthGroups.push(currentGroup)
+      } else {
+        currentGroup.weekCount++
       }
 
       for (let d = 0; d < 7; d++) {
@@ -139,14 +164,17 @@ export function MobileHabitView({
         const mo = dt.getMonth()
         const da = dt.getDate()
         const k = dateKey(y, mo, da)
-        days.push({
+        const dayObj = {
           date: dt,
           key: k,
           dayOfMonth: da,
           monthIndex: mo,
           isToday: k === today.key,
           isFuture: k > today.key,
-        })
+          globalColIndex: w,
+        }
+        days.push(dayObj)
+        currentGroup.days.push(dayObj)
       }
     }
 
@@ -160,7 +188,7 @@ export function MobileHabitView({
         ? `${MONTHS[startM].slice(0, 3)} – ${MONTHS[endM].slice(0, 3)} ${endY}`
         : `${MONTHS[startM].slice(0, 3)} ${startY} – ${MONTHS[endM].slice(0, 3)} ${endY}`
 
-    return { days, weekLabels, rangeLabel }
+    return { days, monthGroups, rangeLabel }
   }, [year, month, dim, today.y, today.m, today.d, today.key, isCurrentMonth])
 
   return (
@@ -324,10 +352,17 @@ export function MobileHabitView({
           <div className="flex items-center gap-2">
             <span className="font-extrabold text-ink">{quarterlyData.rangeLabel}</span>
             <span className="rounded-md bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-[10.5px] font-bold text-emerald-400">
-              3 Months (13 Weeks)
+              13 Weeks
             </span>
           </div>
-          <span className="text-[11px] text-ink-3 font-semibold">91 Days Matrix</span>
+          <button
+            onClick={() => setWaveKey((k) => k + 1)}
+            className="flex items-center gap-1 rounded-lg bg-surface px-2.5 py-1 text-[11px] font-extrabold text-accent border border-line/80 hover:border-accent active:scale-95 transition-all shadow-2xs"
+            title="Scan Left-to-Right wave"
+          >
+            <span>⚡</span>
+            <span>Scan Wave</span>
+          </button>
         </div>
       )}
 
@@ -493,19 +528,18 @@ export function MobileHabitView({
                         </span>
                       </div>
 
-                      {/* Month Labels above columns */}
-                      <div className="flex justify-between text-[9px] font-bold text-ink-3/80 mb-1 pl-5 pr-1">
-                        {quarterlyData.weekLabels.map((wl) => (
-                          <span
-                            key={wl.index}
-                            className={
-                              wl.label === MONTHS[month].slice(0, 3)
-                                ? 'text-accent font-extrabold'
-                                : ''
-                            }
+                      {/* Month Labels cleanly centered over their exact columns (without "4 weeks") */}
+                      <div className="flex text-[9.5px] font-bold text-ink-3/80 mb-1 pl-5.5 pr-1 items-center">
+                        {quarterlyData.monthGroups.map((mg) => (
+                          <div
+                            key={mg.monthIndex}
+                            style={{ flex: mg.weekCount }}
+                            className={`text-center truncate px-0.5 ${
+                              mg.isCurrent ? 'text-accent font-extrabold' : ''
+                            }`}
                           >
-                            {wl.label}
-                          </span>
+                            {mg.name}
+                          </div>
                         ))}
                       </div>
 
@@ -518,36 +552,73 @@ export function MobileHabitView({
                           ))}
                         </div>
 
-                        {/* 13 columns x 7 rows grid */}
-                        <div className="grid grid-flow-col grid-rows-7 gap-1">
-                          {quarterlyData.days.map((d) => {
-                            const on = !d.isFuture && !!state.checks[ck(habit.id, d.key)]
-                            return (
-                              <button
-                                key={d.key}
-                                type="button"
-                                disabled={d.isFuture}
-                                onClick={(e) => onToggle(habit.id, d.key, e.currentTarget)}
-                                className={`size-3.5 sm:size-4 rounded-[3.5px] transition-transform active:scale-90 hover:scale-125 ${
-                                  d.isToday
-                                    ? 'ring-2 ring-accent ring-offset-1 ring-offset-surface'
-                                    : ''
-                                } ${d.isFuture ? 'opacity-15 cursor-not-allowed' : 'cursor-pointer'}`}
+                        {/* 13 columns grouped by month with sleek vertical divider lines */}
+                        <div key={waveKey} className="flex items-center gap-1.5">
+                          {quarterlyData.monthGroups.map((mg, groupIdx) => (
+                            <div key={mg.monthIndex} className="flex items-center gap-1.5">
+                              {/* Sleek Vertical Divider Line between months */}
+                              {groupIdx > 0 && (
+                                <div
+                                  className={`w-[1px] h-[106px] rounded-full my-auto transition-colors ${
+                                    mg.isCurrent
+                                      ? 'bg-accent/60 shadow-[0_0_6px_var(--accent)]'
+                                      : 'bg-line/80'
+                                  }`}
+                                />
+                              )}
+
+                              {/* Month columns grid */}
+                              <div
+                                className="grid grid-flow-col grid-rows-7 gap-1"
                                 style={{
-                                  background: on
-                                    ? habitColor
-                                    : 'color-mix(in srgb, var(--line) 75%, transparent)',
-                                  boxShadow: on
-                                    ? `0 0 6px color-mix(in srgb, ${habitColor} 45%, transparent)`
-                                    : 'none',
-                                  opacity: d.isFuture ? 0.15 : on ? 0.95 : 0.45,
+                                  gridTemplateColumns: `repeat(${mg.weekCount}, minmax(0, 1fr))`,
                                 }}
-                                title={`${MONTHS[d.monthIndex]} ${d.dayOfMonth}: ${
-                                  d.isFuture ? 'Upcoming' : on ? 'Done' : 'Not done'
-                                }`}
-                              />
-                            )
-                          })}
+                              >
+                                {mg.days.map((d) => {
+                                  const on = !d.isFuture && !!state.checks[ck(habit.id, d.key)]
+                                  const isWaveActive = waveKey > 0
+
+                                  return (
+                                    <button
+                                      key={d.key}
+                                      type="button"
+                                      disabled={d.isFuture}
+                                      onClick={(e) => onToggle(habit.id, d.key, e.currentTarget)}
+                                      className={`size-3.5 sm:size-4 rounded-[3.5px] transition-transform active:scale-90 hover:scale-125 ${
+                                        d.isToday
+                                          ? 'ring-2 ring-accent ring-offset-1 ring-offset-surface'
+                                          : ''
+                                      } ${d.isFuture ? 'opacity-15 cursor-not-allowed' : 'cursor-pointer'} ${
+                                        isWaveActive
+                                          ? on
+                                            ? 'wave-flash-done'
+                                            : !d.isFuture
+                                            ? 'wave-flash-missed'
+                                            : ''
+                                          : ''
+                                      }`}
+                                      style={{
+                                        color: habitColor,
+                                        background: on
+                                          ? habitColor
+                                          : 'color-mix(in srgb, var(--line) 75%, transparent)',
+                                        boxShadow: on
+                                          ? `0 0 6px color-mix(in srgb, ${habitColor} 50%, transparent)`
+                                          : 'none',
+                                        opacity: d.isFuture ? 0.15 : on ? 0.95 : 0.45,
+                                        animationDelay: isWaveActive
+                                          ? `${d.globalColIndex * 65}ms`
+                                          : undefined,
+                                      }}
+                                      title={`${MONTHS[d.monthIndex]} ${d.dayOfMonth}: ${
+                                        d.isFuture ? 'Upcoming' : on ? 'Done' : 'Not done'
+                                      }`}
+                                    />
+                                  )
+                                })}
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       </div>
                     </div>
