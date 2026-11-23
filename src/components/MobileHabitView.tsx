@@ -92,6 +92,77 @@ export function MobileHabitView({
   const currentPct = habitCount > 0 ? Math.round((todayDone / habitCount) * 100) : 0
   const strokeDashoffset = 125.6 - (125.6 * (habitCount > 0 ? todayDone / habitCount : 0))
 
+  // 3-Month (13 Weeks = 91 Days) Quarterly Heatmap data
+  const quarterlyData = useMemo(() => {
+    const refDate = isCurrentMonth
+      ? new Date(today.y, today.m, today.d)
+      : new Date(year, month, dim)
+
+    const dayOfWeek = refDate.getDay() // 0 = Sun, 6 = Sat
+    const endSaturday = new Date(
+      refDate.getFullYear(),
+      refDate.getMonth(),
+      refDate.getDate() + (6 - dayOfWeek)
+    )
+
+    const days: {
+      date: Date
+      key: string
+      dayOfMonth: number
+      monthIndex: number
+      isToday: boolean
+      isFuture: boolean
+    }[] = []
+
+    const weekLabels: { index: number; label: string }[] = []
+    let lastMonth = -1
+
+    for (let w = 0; w < 13; w++) {
+      const weekStartDate = new Date(
+        endSaturday.getFullYear(),
+        endSaturday.getMonth(),
+        endSaturday.getDate() - (12 - w) * 7 - 6
+      )
+      const m = weekStartDate.getMonth()
+      if (m !== lastMonth) {
+        weekLabels.push({ index: w, label: MONTHS[m].slice(0, 3) })
+        lastMonth = m
+      }
+
+      for (let d = 0; d < 7; d++) {
+        const dt = new Date(
+          weekStartDate.getFullYear(),
+          weekStartDate.getMonth(),
+          weekStartDate.getDate() + d
+        )
+        const y = dt.getFullYear()
+        const mo = dt.getMonth()
+        const da = dt.getDate()
+        const k = dateKey(y, mo, da)
+        days.push({
+          date: dt,
+          key: k,
+          dayOfMonth: da,
+          monthIndex: mo,
+          isToday: k === today.key,
+          isFuture: k > today.key,
+        })
+      }
+    }
+
+    const startM = days[0].monthIndex
+    const startY = days[0].date.getFullYear()
+    const endM = days[days.length - 1].monthIndex
+    const endY = days[days.length - 1].date.getFullYear()
+
+    const rangeLabel =
+      startY === endY
+        ? `${MONTHS[startM].slice(0, 3)} – ${MONTHS[endM].slice(0, 3)} ${endY}`
+        : `${MONTHS[startM].slice(0, 3)} ${startY} – ${MONTHS[endM].slice(0, 3)} ${endY}`
+
+    return { days, weekLabels, rangeLabel }
+  }, [year, month, dim, today.y, today.m, today.d, today.key, isCurrentMonth])
+
   return (
     <div className="space-y-4">
       {/* 1. Mini Hero / Today Status Card */}
@@ -247,6 +318,19 @@ export function MobileHabitView({
         </div>
       )}
 
+      {/* 3b. Range Selector Bar (Visible when in Overall view) */}
+      {activeTab === 'overall' && (
+        <div className="flex items-center justify-between rounded-2xl bg-surface-2/70 px-4 py-2 border border-line/60 text-xs">
+          <div className="flex items-center gap-2">
+            <span className="font-extrabold text-ink">{quarterlyData.rangeLabel}</span>
+            <span className="rounded-md bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-[10.5px] font-bold text-emerald-400">
+              3 Months (13 Weeks)
+            </span>
+          </div>
+          <span className="text-[11px] text-ink-3 font-semibold">91 Days Matrix</span>
+        </div>
+      )}
+
       {/* 4. Habit Cards List */}
       {habitCount === 0 ? (
         <div className="card p-8 text-center space-y-2">
@@ -392,40 +476,83 @@ export function MobileHabitView({
                   </div>
                 )}
 
-                {/* TAB 3: OVERALL (5-Row Squircle Heatmap) */}
-                {activeTab === 'overall' && (
-                  <div className="pt-2.5 border-t border-line/50">
-                    <div className="flex items-center justify-between text-[10.5px] font-semibold text-ink-3 mb-1.5">
-                      <span>Monthly Consistency ({dim} days)</span>
-                      <span className="text-emerald-500 font-bold">
-                        {stats.perHabit.find((p) => p.habit.id === habit.id)?.done ?? 0} days done
-                      </span>
-                    </div>
+                {/* TAB 3: OVERALL (3-Month 13-Week Squircle Heatmap) */}
+                {activeTab === 'overall' && (() => {
+                  const doneCount = quarterlyData.days.filter(
+                    (d) => !d.isFuture && !!state.checks[ck(habit.id, d.key)]
+                  ).length
+                  const pastDays = quarterlyData.days.filter((d) => !d.isFuture).length
+                  const pct = pastDays > 0 ? Math.round((doneCount / pastDays) * 100) : 0
 
-                    {/* 5-row rounded squircle tiles */}
-                    <div className="grid grid-flow-col grid-rows-5 gap-1 overflow-x-auto py-1">
-                      {Array.from({ length: dim }, (_, i) => i + 1).map((d) => {
-                        const date = dateKey(year, month, d)
-                        const on = !!state.checks[ck(habit.id, date)]
-                        const isDayToday = date === today.key
+                  return (
+                    <div className="pt-2.5 border-t border-line/50">
+                      <div className="flex items-center justify-between text-[10.5px] font-semibold text-ink-3 mb-1.5">
+                        <span>3-Month Consistency (13 Weeks)</span>
+                        <span className="text-emerald-500 font-bold">
+                          {doneCount} / {pastDays} days ({pct}%)
+                        </span>
+                      </div>
 
-                        return (
-                          <div
-                            key={d}
-                            className={`size-3 rounded-[3.5px] transition-transform hover:scale-125 ${
-                              isDayToday ? 'ring-1.5 ring-accent' : ''
-                            }`}
-                            style={{
-                              background: on ? habitColor : 'color-mix(in srgb, var(--line) 70%, transparent)',
-                              opacity: on ? 0.95 : 0.35,
-                            }}
-                            title={`${MONTHS[month]} ${d}: ${on ? 'Done' : 'Not done'}`}
-                          />
-                        )
-                      })}
+                      {/* Month Labels above columns */}
+                      <div className="flex justify-between text-[9px] font-bold text-ink-3/80 mb-1 pl-5 pr-1">
+                        {quarterlyData.weekLabels.map((wl) => (
+                          <span
+                            key={wl.index}
+                            className={
+                              wl.label === MONTHS[month].slice(0, 3)
+                                ? 'text-accent font-extrabold'
+                                : ''
+                            }
+                          >
+                            {wl.label}
+                          </span>
+                        ))}
+                      </div>
+
+                      {/* Heatmap Container */}
+                      <div className="flex items-center gap-1.5 rounded-xl bg-surface-2/70 p-2 border border-line/50 overflow-x-auto justify-center">
+                        {/* Weekday indicator on left: S M T W T F S */}
+                        <div className="flex flex-col justify-between text-[8px] font-bold text-ink-3/70 h-[108px] pr-0.5 select-none">
+                          {WEEKDAY_LETTERS.map((w, idx) => (
+                            <span key={idx}>{w}</span>
+                          ))}
+                        </div>
+
+                        {/* 13 columns x 7 rows grid */}
+                        <div className="grid grid-flow-col grid-rows-7 gap-1">
+                          {quarterlyData.days.map((d) => {
+                            const on = !d.isFuture && !!state.checks[ck(habit.id, d.key)]
+                            return (
+                              <button
+                                key={d.key}
+                                type="button"
+                                disabled={d.isFuture}
+                                onClick={(e) => onToggle(habit.id, d.key, e.currentTarget)}
+                                className={`size-3.5 sm:size-4 rounded-[3.5px] transition-transform active:scale-90 hover:scale-125 ${
+                                  d.isToday
+                                    ? 'ring-2 ring-accent ring-offset-1 ring-offset-surface'
+                                    : ''
+                                } ${d.isFuture ? 'opacity-15 cursor-not-allowed' : 'cursor-pointer'}`}
+                                style={{
+                                  background: on
+                                    ? habitColor
+                                    : 'color-mix(in srgb, var(--line) 75%, transparent)',
+                                  boxShadow: on
+                                    ? `0 0 6px color-mix(in srgb, ${habitColor} 45%, transparent)`
+                                    : 'none',
+                                  opacity: d.isFuture ? 0.15 : on ? 0.95 : 0.45,
+                                }}
+                                title={`${MONTHS[d.monthIndex]} ${d.dayOfMonth}: ${
+                                  d.isFuture ? 'Upcoming' : on ? 'Done' : 'Not done'
+                                }`}
+                              />
+                            )
+                          })}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )
+                })()}
               </div>
             )
           })}
