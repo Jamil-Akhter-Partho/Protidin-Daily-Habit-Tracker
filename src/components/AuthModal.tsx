@@ -80,7 +80,7 @@ export function AuthModal({ user, syncStatus, lastSyncedAt, isOpen, onClose }: A
               Cloud Sync
             </h2>
             <p className="text-xs text-ink-3 font-semibold">
-              ফোন ও ল্যাপটপে স্বয়ংক্রিয় রিয়েলটাইম সিঙ্ক
+              Automatic real-time sync across devices
             </p>
           </div>
         </div>
@@ -110,7 +110,7 @@ export function AuthModal({ user, syncStatus, lastSyncedAt, isOpen, onClose }: A
           <div className="space-y-4">
             <div className="rounded-2xl border border-line/70 bg-surface-2 p-4 space-y-3">
               <div className="flex items-center justify-between text-xs font-semibold">
-                <span className="text-ink-3">লগইন করা অ্যাকাউন্ট:</span>
+                <span className="text-ink-3">Signed in as:</span>
                 <span className="inline-flex items-center gap-1.5 font-bold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full text-[10.5px]">
                   <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                   Active
@@ -130,7 +130,7 @@ export function AuthModal({ user, syncStatus, lastSyncedAt, isOpen, onClose }: A
               </div>
 
               <div className="pt-2 border-t border-line/50 flex items-center justify-between text-[11px] text-ink-3">
-                <span>সিঙ্ক স্ট্যাটাস:</span>
+                <span>Sync status:</span>
                 <span className="font-bold text-ink flex items-center gap-1">
                   {syncStatus === 'syncing' ? (
                     <>
@@ -150,7 +150,7 @@ export function AuthModal({ user, syncStatus, lastSyncedAt, isOpen, onClose }: A
             </div>
 
             <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-600 dark:text-emerald-400 leading-relaxed font-semibold">
-              ⚡ <strong>রিয়েলটাইম সিঙ্ক চালু আছে!</strong> আপনি ফোনে টিক দিলে ল্যাপটপে এবং ল্যাপটপে টিক দিলে ফোনে স্বয়ংক্রিয়ভাবে আপডেট হয়ে যাবে।
+              ⚡ <strong>Real-time sync active!</strong> Habits ticked on your phone will automatically update on your desktop in real time.
             </div>
 
             <button
@@ -167,8 +167,8 @@ export function AuthModal({ user, syncStatus, lastSyncedAt, isOpen, onClose }: A
           /* ========================================================= */
           <div className="space-y-4">
             <p className="text-xs text-ink-2 leading-relaxed">
-              আপনার গুগল আইডি বা ইমেইল দিয়ে সাইন-ইন করে নিলে ফোন ও ল্যাপটপে 
-              সব হ্যাবিট ও টিক্স চিরদিনের জন্য নিরাপদ থাকবে ও সাথে সাথে সিঙ্ক হবে।
+              Sign in with your Google account or email to keep your habits safely 
+              backed up and synced seamlessly across all your devices.
             </p>
 
             {/* 1. Google One-Click Login */}
@@ -238,7 +238,7 @@ export function AuthModal({ user, syncStatus, lastSyncedAt, isOpen, onClose }: A
 
             <div className="pt-2 text-center text-[10.5px] text-ink-3 flex items-center justify-center gap-1.5 font-medium">
               <Sparkles size={12} className="text-amber-500" />
-              <span>১০০% ফ্রি ও আজীবন নিরাপদ ক্লাউড সিঙ্ক</span>
+              <span>100% free & secure permanent cloud sync</span>
             </div>
           </div>
         )}

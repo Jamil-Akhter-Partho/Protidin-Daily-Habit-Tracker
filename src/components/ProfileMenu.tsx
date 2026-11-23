@@ -224,7 +224,7 @@ export function ProfileMenu() {
             inset 0 -1px 1px 0 rgba(0, 0, 0, 0.2)
           `,
         }}
-        title="মাউস চেপে ধরে যেকোনো জায়গায় ড্র্যাগ করুন • ক্লিক করে প্রোফাইল এডিট করুন"
+        title="Drag anywhere to reposition • Click to edit profile"
       >
         {/* Avatar Display */}
         <div
