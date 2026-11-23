@@ -183,11 +183,32 @@ export function useStore() {
     fetchRemoteState(user.id).then((remote) => {
       if (isCancelled) return
       if (remote) {
-        // Replace local state with cloud state
+        // Smart Merge: Merge remote checks and local checks so no ticks are ever lost
+        const local = stateRef.current
+        const mergedChecks = { ...local.checks, ...remote.checks }
+
+        const habitMap = new Map<string, Habit>()
+        remote.habits.forEach((h) => habitMap.set(h.id, h))
+        local.habits.forEach((h) => {
+          if (!habitMap.has(h.id)) habitMap.set(h.id, h)
+        })
+        const mergedHabits = Array.from(habitMap.values())
+
+        const mergedState: State = {
+          version: 1,
+          habits: mergedHabits.length > 0 ? mergedHabits : remote.habits,
+          checks: mergedChecks,
+        }
+
         isRemoteUpdateRef.current = true
-        dispatch({ type: 'replace', state: remote })
-        setSyncStatus('synced')
-        setLastSyncedAt(new Date())
+        dispatch({ type: 'replace', state: mergedState })
+
+        saveRemoteState(user.id, mergedState).then(() => {
+          if (!isCancelled) {
+            setSyncStatus('synced')
+            setLastSyncedAt(new Date())
+          }
+        })
       } else {
         // First time cloud sync: Upload current local state to cloud!
         saveRemoteState(user.id, stateRef.current).then((ok) => {
