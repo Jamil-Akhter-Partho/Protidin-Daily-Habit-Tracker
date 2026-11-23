@@ -555,6 +555,15 @@ body {
 }
 .field:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent); }
 
+/* ---------- mobile optimizations ---------- */
+.squircle-tile {
+  border-radius: 3.5px;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+.bubble-btn:active {
+  transform: scale(0.88);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-delay: 0ms !important; transition-duration: 0.01ms !important; }
   html { scroll-behavior: auto; }

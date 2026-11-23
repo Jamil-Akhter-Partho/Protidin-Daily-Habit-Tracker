@@ -21,7 +21,16 @@ const Label = ({ children }: { children: string }) => (
 
 export function ThemeMenu({ theme }: { theme: ThemeState }) {
   const [open, setOpen] = useState(false)
+  const [topPos, setTopPos] = useState(46)
   const wrap = useRef<HTMLDivElement>(null)
+
+  const toggleOpen = () => {
+    if (!open && wrap.current) {
+      const rect = wrap.current.getBoundingClientRect()
+      setTopPos(rect.bottom + 8)
+    }
+    setOpen((o) => !o)
+  }
 
   useEffect(() => {
     if (!open) return
@@ -46,7 +55,7 @@ export function ThemeMenu({ theme }: { theme: ThemeState }) {
     <div ref={wrap} className="relative">
       <button
         className="btn !w-[38px] justify-center !px-0"
-        onClick={() => setOpen((o) => !o)}
+        onClick={toggleOpen}
         aria-label="Appearance"
         aria-haspopup="dialog"
         aria-expanded={open}
@@ -58,8 +67,11 @@ export function ThemeMenu({ theme }: { theme: ThemeState }) {
         <div
           role="dialog"
           aria-label="Appearance"
-          className="menu-pop absolute right-0 top-[46px] z-30 w-[326px] space-y-3 rounded-3xl border border-line bg-surface p-3"
-          style={{ boxShadow: 'var(--shadow-pop)' }}
+          className="menu-pop fixed sm:absolute left-1/2 -translate-x-1/2 sm:translate-x-0 sm:left-auto sm:right-0 sm:top-[46px] z-50 w-[min(326px,calc(100vw-1.5rem))] space-y-3 rounded-3xl border border-line bg-surface p-3"
+          style={{
+            top: typeof window !== 'undefined' && window.innerWidth < 640 ? `${topPos}px` : undefined,
+            boxShadow: 'var(--shadow-pop)',
+          }}
         >
           <div>
             <Label>Style</Label>

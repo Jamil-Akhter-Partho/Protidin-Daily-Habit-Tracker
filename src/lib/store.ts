@@ -1,4 +1,6 @@
-import { useEffect, useReducer } from 'react'
+import { useEffect, useReducer, useRef, useState } from 'react'
+import type { User } from '@supabase/supabase-js'
+import { supabase, fetchRemoteState, saveRemoteState } from './supabase'
 
 export interface Habit {
   id: string
@@ -141,12 +143,126 @@ function load(): State {
 
 export function useStore() {
   const [state, dispatch] = useReducer(reducer, undefined, load)
+  const [user, setUser] = useState<User | null>(null)
+  const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'synced' | 'error'>('idle')
+  const [lastSyncedAt, setLastSyncedAt] = useState<Date | null>(null)
+  const isRemoteUpdateRef = useRef(false)
+  const saveTimeoutRef = useRef<number | null>(null)
+  const stateRef = useRef(state)
+  stateRef.current = state
+
+  // 1. Listen to Supabase Auth State
+  useEffect(() => {
+    if (!supabase) return
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null)
+    })
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
+    })
+
+    return () => {
+      subscription.unsubscribe()
+    }
+  }, [])
+
+  // 2. When User logs in: Fetch remote state and merge / sync
+  useEffect(() => {
+    if (!user || !supabase) {
+      setSyncStatus('idle')
+      return
+    }
+
+    let isCancelled = false
+    setSyncStatus('syncing')
+
+    fetchRemoteState(user.id).then((remote) => {
+      if (isCancelled) return
+      if (remote) {
+        // Replace local state with cloud state
+        isRemoteUpdateRef.current = true
+        dispatch({ type: 'replace', state: remote })
+        setSyncStatus('synced')
+        setLastSyncedAt(new Date())
+      } else {
+        // First time cloud sync: Upload current local state to cloud!
+        saveRemoteState(user.id, stateRef.current).then((ok) => {
+          if (!isCancelled && ok) {
+            setSyncStatus('synced')
+            setLastSyncedAt(new Date())
+          }
+        })
+      }
+    })
+
+    // 3. Realtime Subscription: Listen for changes from other devices (Phone -> Laptop / vice versa)
+    const channel = supabase
+      .channel(`habits_sync_${user.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'user_habits',
+          filter: `user_id=eq.${user.id}`,
+        },
+        (payload) => {
+          if (payload.new && typeof payload.new === 'object' && 'state' in payload.new) {
+            const newState = parseState((payload.new as { state: unknown }).state)
+            if (newState) {
+              isRemoteUpdateRef.current = true
+              dispatch({ type: 'replace', state: newState })
+              setSyncStatus('synced')
+              setLastSyncedAt(new Date())
+            }
+          }
+        }
+      )
+      .subscribe()
+
+    return () => {
+      isCancelled = true
+      supabase?.removeChannel(channel)
+    }
+  }, [user?.id])
+
+  // 4. Save to localStorage instantly & debounce save to Supabase if logged in
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
     } catch {
-      // storage full or blocked; the app keeps working in memory
+      // storage unavailable
     }
-  }, [state])
-  return { state, dispatch }
+
+    // If this update came from remote websocket, don't echo it back
+    if (isRemoteUpdateRef.current) {
+      isRemoteUpdateRef.current = false
+      return
+    }
+
+    // If user is logged in, debounce save to Supabase (500ms)
+    if (user && supabase) {
+      setSyncStatus('syncing')
+      if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current)
+      saveTimeoutRef.current = window.setTimeout(async () => {
+        const ok = await saveRemoteState(user.id, state)
+        if (ok) {
+          setSyncStatus('synced')
+          setLastSyncedAt(new Date())
+        } else {
+          setSyncStatus('error')
+        }
+      }, 500)
+    }
+
+    return () => {
+      if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current)
+    }
+  }, [state, user?.id])
+
+  return { state, dispatch, user, syncStatus, lastSyncedAt }
 }

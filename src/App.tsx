@@ -12,6 +12,8 @@ import { RewardsPanel } from './components/Rewards'
 import { StatCards } from './components/StatCards'
 import { ProfileMenu } from './components/ProfileMenu'
 import { InstallPopup } from './components/InstallPopup'
+import { AuthModal } from './components/AuthModal'
+import { MobileHabitView } from './components/MobileHabitView'
 import { useToday } from './lib/hooks'
 import { BADGES, computeRewards, XP_PER_CHECK } from './lib/rewards'
 import { monthStats } from './lib/stats'
@@ -22,15 +24,17 @@ type ModalState = { kind: 'new' } | { kind: 'edit'; habit: Habit } | null
 type ConfirmState = { title: string; body: string; confirmLabel: string; danger?: boolean; run: () => void } | null
 
 export default function App() {
-  const { state, dispatch } = useStore()
+  const { state, dispatch, user, syncStatus, lastSyncedAt } = useStore()
   const today = useToday()
   const [view, setView] = useState({ y: today.y, m: today.m })
   const [modal, setModal] = useState<ModalState>(null)
+  const [authOpen, setAuthOpen] = useState(false)
   const [confirm, setConfirm] = useState<ConfirmState>(null)
   const [toast, setToast] = useState<string | null>(null)
   const [queue, setQueue] = useState<CelebrationEvent[]>([])
   const [burst, setBurst] = useState(0)
   const [floaters, setFloaters] = useState<Floater[]>([])
+  const [forceDesktop, setForceDesktop] = useState(false)
   const seq = useRef(0)
   const theme = useTheme()
   const garden = theme.style === 'garden'
@@ -151,6 +155,9 @@ export default function App() {
         isCurrentMonth={isCurrentMonth}
         rewards={rewards}
         theme={theme}
+        user={user}
+        syncStatus={syncStatus}
+        onOpenAuth={() => setAuthOpen(true)}
         onPrev={() => shiftMonth(-1)}
         onNext={() => shiftMonth(1)}
         onToday={() => setView({ y: today.y, m: today.m })}
@@ -159,66 +166,107 @@ export default function App() {
         onImport={importBackup}
       />
 
-      {garden ? (
-        <GardenHero
-          key={`${view.y}-${view.m}`}
-          stats={stats}
-          state={state}
-          todayDone={todayDone}
-          isCurrentMonth={isCurrentMonth}
-          year={view.y}
-          month={view.m}
-          today={today}
-        />
-      ) : noor ? (
-        <NoorHero
-          key={`noor-${view.y}-${view.m}`}
-          activeTheme={activeTheme}
-          stats={stats}
-          state={state}
-          todayDone={todayDone}
-          isCurrentMonth={isCurrentMonth}
-          year={view.y}
-          month={view.m}
-          today={today}
-        />
-      ) : (
-        <StatCards stats={stats} todayDone={todayDone} habitCount={state.habits.length} />
+      {/* Mobile banner when viewing full desktop grid on mobile */}
+      {forceDesktop && (
+        <div className="lg:hidden flex items-center justify-between rounded-2xl bg-accent/15 border border-accent/30 px-4 py-2 text-xs font-bold text-accent">
+          <span>Viewing 31-Day Desktop Grid</span>
+          <button
+            className="btn !h-7 !px-2.5 !text-[11px]"
+            onClick={() => setForceDesktop(false)}
+          >
+            📱 Return to Mobile View
+          </button>
+        </div>
       )}
 
-      <HabitGrid
-        garden={garden}
-        noor={noor}
-        stats={stats}
-        checks={state.checks}
-        year={view.y}
-        month={view.m}
-        today={today}
-        onToggle={handleToggle}
-        onEdit={(habit) => setModal({ kind: 'edit', habit })}
-        onMove={(id, dir) => dispatch({ type: 'move', id, dir })}
-        onAdd={() => setModal({ kind: 'new' })}
-      />
+      {/* ============================================================ */}
+      {/* DESKTOP & LAPTOP VIEW (screens >= 1024px, or forceDesktop)    */}
+      {/* 100% UNTOUCHED, EXACTLY AS ORIGINALLY CRAFTED                 */}
+      {/* ============================================================ */}
+      <div className={forceDesktop ? 'space-y-5' : 'hidden lg:block space-y-5'}>
+        {garden ? (
+          <GardenHero
+            key={`${view.y}-${view.m}`}
+            stats={stats}
+            state={state}
+            todayDone={todayDone}
+            isCurrentMonth={isCurrentMonth}
+            year={view.y}
+            month={view.m}
+            today={today}
+          />
+        ) : noor ? (
+          <NoorHero
+            key={`noor-${view.y}-${view.m}`}
+            activeTheme={activeTheme}
+            stats={stats}
+            state={state}
+            todayDone={todayDone}
+            isCurrentMonth={isCurrentMonth}
+            year={view.y}
+            month={view.m}
+            today={today}
+          />
+        ) : (
+          <StatCards stats={stats} todayDone={todayDone} habitCount={state.habits.length} />
+        )}
 
-      {/* key: replay the chart entrance animation when the month changes */}
-      {garden ? (
-        <div className="grid gap-5 xl:grid-cols-3" key={`g-${view.y}-${view.m}`}>
-          <WeekdayFlower stats={stats} />
-          <WeeklyBlooms stats={stats} month={view.m} className="xl:col-span-2" />
-        </div>
-      ) : noor ? (
-        <div className="grid gap-5 xl:grid-cols-3" key={`n-${view.y}-${view.m}`}>
-          <MinaretChart stats={stats} />
-          <WeeklyHilals stats={stats} month={view.m} className="xl:col-span-2" />
-        </div>
-      ) : (
-        <>
-          <div className="grid gap-5 xl:grid-cols-3" key={`${view.y}-${view.m}`}>
-            <RhythmChart stats={stats} state={state} year={view.y} month={view.m} today={today} />
-            <WeekdayChart stats={stats} />
+        <HabitGrid
+          garden={garden}
+          noor={noor}
+          stats={stats}
+          checks={state.checks}
+          year={view.y}
+          month={view.m}
+          today={today}
+          onToggle={handleToggle}
+          onEdit={(habit) => setModal({ kind: 'edit', habit })}
+          onMove={(id, dir) => dispatch({ type: 'move', id, dir })}
+          onAdd={() => setModal({ kind: 'new' })}
+        />
+
+        {/* key: replay the chart entrance animation when the month changes */}
+        {garden ? (
+          <div className="grid gap-5 xl:grid-cols-3" key={`g-${view.y}-${view.m}`}>
+            <WeekdayFlower stats={stats} />
+            <WeeklyBlooms stats={stats} month={view.m} className="xl:col-span-2" />
           </div>
-          <WeeklyDonuts stats={stats} month={view.m} />
-        </>
+        ) : noor ? (
+          <div className="grid gap-5 xl:grid-cols-3" key={`n-${view.y}-${view.m}`}>
+            <MinaretChart stats={stats} />
+            <WeeklyHilals stats={stats} month={view.m} className="xl:col-span-2" />
+          </div>
+        ) : (
+          <>
+            <div className="grid gap-5 xl:grid-cols-3" key={`${view.y}-${view.m}`}>
+              <RhythmChart stats={stats} state={state} year={view.y} month={view.m} today={today} />
+              <WeekdayChart stats={stats} />
+            </div>
+            <WeeklyDonuts stats={stats} month={view.m} />
+          </>
+        )}
+      </div>
+
+      {/* ============================================================ */}
+      {/* MOBILE & TABLET VIEW (screens < 1024px when not forceDesktop) */}
+      {/* ============================================================ */}
+      {!forceDesktop && (
+        <div className="block lg:hidden space-y-4">
+          <MobileHabitView
+            stats={stats}
+            state={state}
+            year={view.y}
+            month={view.m}
+            today={today}
+            theme={theme}
+            todayDone={todayDone}
+            isCurrentMonth={isCurrentMonth}
+            onToggle={handleToggle}
+            onEdit={(habit) => setModal({ kind: 'edit', habit })}
+            onAdd={() => setModal({ kind: 'new' })}
+            onSwitchToDesktop={() => setForceDesktop(true)}
+          />
+        </div>
       )}
       <RewardsPanel rewards={rewards} garden={garden} noor={noor} />
 
@@ -259,6 +307,13 @@ export default function App() {
       <Floaters items={floaters} onDone={removeFloater} />
       <ProfileMenu />
       <InstallPopup />
+      <AuthModal
+        user={user}
+        syncStatus={syncStatus}
+        lastSyncedAt={lastSyncedAt}
+        isOpen={authOpen}
+        onClose={() => setAuthOpen(false)}
+      />
 
       {toast && (
         <div className="toast fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-xl border border-white/10 bg-panel px-4 py-2.5 text-[13px] font-semibold text-white shadow-lg" role="status">

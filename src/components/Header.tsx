@@ -1,5 +1,6 @@
 import { useMemo, useRef } from 'react'
-import { ChevronLeft, ChevronRight, Download, Plus, Upload } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Cloud, Download, Plus, Upload } from 'lucide-react'
+import type { User } from '@supabase/supabase-js'
 import { MONTHS } from '../lib/date'
 import { getHijriDate } from '../lib/hijri'
 import type { Rewards } from '../lib/rewards'
@@ -13,6 +14,9 @@ export function Header({
   isCurrentMonth,
   rewards,
   theme,
+  user,
+  syncStatus,
+  onOpenAuth,
   onPrev,
   onNext,
   onToday,
@@ -25,6 +29,9 @@ export function Header({
   isCurrentMonth: boolean
   rewards: Rewards
   theme: ThemeState
+  user?: User | null
+  syncStatus?: 'idle' | 'syncing' | 'synced' | 'error'
+  onOpenAuth?: () => void
   onPrev: () => void
   onNext: () => void
   onToday: () => void
@@ -54,8 +61,8 @@ export function Header({
         <button className="icon-btn" onClick={onPrev} aria-label="Previous month">
           <ChevronLeft size={20} />
         </button>
-        <div className="flex min-w-[230px] flex-col items-center">
-          <h1 className="text-center font-display text-[26px] sm:text-[28px] font-extrabold tracking-tight leading-tight">
+        <div className="flex min-w-[190px] sm:min-w-[230px] flex-col items-center">
+          <h1 className="text-center font-display text-[22px] sm:text-[28px] font-extrabold tracking-tight leading-tight">
             {MONTHS[month]} <span className="text-ink-3">{year}</span>
           </h1>
           {noor && (
@@ -75,14 +82,37 @@ export function Header({
         )}
       </div>
 
-      <div className="ml-auto flex flex-wrap items-center gap-2">
+      <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
         <LevelChip rewards={rewards} />
         <ThemeMenu theme={theme} />
-        <button className="btn" onClick={onExport} title="Download a backup file">
-          <Download size={16} /> Backup
+        {onOpenAuth && (
+          <button
+            className={`btn !h-[38px] !px-2.5 sm:!px-3 shrink-0 ${
+              user ? 'text-emerald-500 font-bold' : 'text-ink-3 hover:text-ink'
+            }`}
+            onClick={onOpenAuth}
+            title={
+              user
+                ? `Cloud Sync Active (${user.email})`
+                : 'Connect Cloud Sync (Phone & Laptop)'
+            }
+          >
+            <Cloud size={16} />
+            <span className="hidden md:inline text-xs">
+              {user ? 'Synced' : 'Sync'}
+            </span>
+            {syncStatus === 'syncing' ? (
+              <span className="size-1.5 rounded-full bg-amber-400 animate-pulse" />
+            ) : user ? (
+              <span className="size-1.5 rounded-full bg-emerald-500" />
+            ) : null}
+          </button>
+        )}
+        <button className="btn !h-[38px] !px-2.5 sm:!px-3.5 shrink-0" onClick={onExport} title="Download a backup file">
+          <Download size={16} /> <span className="hidden sm:inline">Backup</span>
         </button>
-        <button className="btn" onClick={() => fileRef.current?.click()} title="Restore from a backup file">
-          <Upload size={16} /> Restore
+        <button className="btn !h-[38px] !px-2.5 sm:!px-3.5 shrink-0" onClick={() => fileRef.current?.click()} title="Restore from a backup file">
+          <Upload size={16} /> <span className="hidden sm:inline">Restore</span>
         </button>
         <input
           ref={fileRef}
@@ -95,8 +125,12 @@ export function Header({
             e.target.value = ''
           }}
         />
-        <button className="btn btn-primary" onClick={onAdd}>
-          <Plus size={17} /> New habit
+        <button
+          className="btn btn-primary !h-[38px] !px-2.5 sm:!px-3.5 !text-[12px] sm:!text-[13.5px] shrink-0"
+          onClick={onAdd}
+          title="Create a new habit"
+        >
+          <Plus size={16} /> <span>New habit</span>
         </button>
       </div>
     </header>

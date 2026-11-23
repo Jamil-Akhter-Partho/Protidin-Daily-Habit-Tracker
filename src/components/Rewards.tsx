@@ -109,7 +109,7 @@ export function LevelChip({ rewards }: { rewards: Rewards }) {
   return (
     <a
       href="#rewards"
-      className="flex h-[38px] items-center gap-2.5 rounded-xl border border-line bg-surface pl-1.5 pr-3 no-underline transition hover:border-ink-3"
+      className="flex h-[38px] items-center gap-2 sm:gap-2.5 rounded-xl border border-line bg-surface pl-1.5 pr-2.5 sm:pr-3 no-underline transition hover:border-ink-3 shrink-0"
       title={`${rewards.xp} XP in total`}
     >
       <span className="num grid size-7 place-items-center rounded-lg bg-accent text-[12.5px] font-extrabold text-on-accent">
@@ -117,7 +117,7 @@ export function LevelChip({ rewards }: { rewards: Rewards }) {
       </span>
       <span className="leading-none">
         <span className="block text-[12px] font-bold">{rewards.title}</span>
-        <span className="mt-1 block h-1 w-[84px] overflow-hidden rounded-full bg-surface-2">
+        <span className="mt-1 block h-1 w-[56px] sm:w-[84px] overflow-hidden rounded-full bg-surface-2">
           <span className="xp-fill block h-full rounded-full" style={{ width: `${(rewards.intoLevel / rewards.levelSize) * 100}%` }} />
         </span>
       </span>
