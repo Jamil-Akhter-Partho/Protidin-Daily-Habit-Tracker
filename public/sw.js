@@ -1,4 +1,4 @@
-const CACHE_NAME = 'protidin-cache-v2'
+const CACHE_NAME = 'protidin-cache-v4'
 const PRECACHE_ASSETS = [
   './',
   './index.html',
