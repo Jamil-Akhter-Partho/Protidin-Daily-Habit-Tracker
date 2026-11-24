@@ -1,26 +1,7 @@
 import { useState } from 'react'
-import {
-  Cloud,
-  CheckCircle2,
-  LogOut,
-  Mail,
-  Sparkles,
-  X,
-  Loader2,
-  AlertCircle,
-  Lock,
-  LogIn,
-  UserPlus,
-} from 'lucide-react'
+import { Cloud, CheckCircle2, LogOut, Mail, Sparkles, X, Loader2, AlertCircle } from 'lucide-react'
 import { type User } from '@supabase/supabase-js'
-import {
-  signInWithGoogle,
-  signInWithEmailOtp,
-  signInWithPassword,
-  signUpWithPassword,
-  signOutCloud,
-  isSupabaseConfigured,
-} from '../lib/supabase'
+import { signInWithGoogle, signInWithEmailOtp, signOutCloud, isSupabaseConfigured } from '../lib/supabase'
 
 interface AuthModalProps {
   user: User | null
@@ -31,57 +12,11 @@ interface AuthModalProps {
 }
 
 export function AuthModal({ user, syncStatus, lastSyncedAt, isOpen, onClose }: AuthModalProps) {
-  const [tab, setTab] = useState<'signin' | 'signup' | 'magic'>('signin')
   const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
 
   if (!isOpen) return null
-
-  const handlePasswordAuth = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!email.trim() || !password) return
-
-    setLoading(true)
-    setMessage(null)
-
-    if (tab === 'signin') {
-      const { error } = await signInWithPassword(email.trim(), password)
-      setLoading(false)
-      if (error) {
-        setMessage({
-          type: 'error',
-          text: error.message === 'Invalid login credentials'
-            ? 'Incorrect email or password. If you don\'t have an account, click "Sign Up" above.'
-            : error.message,
-        })
-      } else {
-        setMessage({ type: 'success', text: '✅ Logged in successfully! Syncing your habits...' })
-        setTimeout(() => onClose(), 800)
-      }
-    } else {
-      // signup
-      if (password.length < 6) {
-        setMessage({ type: 'error', text: 'Password must be at least 6 characters.' })
-        setLoading(false)
-        return
-      }
-      const { data, error } = await signUpWithPassword(email.trim(), password)
-      setLoading(false)
-      if (error) {
-        setMessage({ type: 'error', text: error.message })
-      } else if (data?.session) {
-        setMessage({ type: 'success', text: '🎉 Account created! Syncing your habits...' })
-        setTimeout(() => onClose(), 800)
-      } else {
-        setMessage({
-          type: 'success',
-          text: 'Account created! If email confirmation is enabled, check your inbox to confirm.',
-        })
-      }
-    }
-  }
 
   const handleGoogleLogin = async () => {
     setLoading(true)
@@ -93,7 +28,7 @@ export function AuthModal({ user, syncStatus, lastSyncedAt, isOpen, onClose }: A
     }
   }
 
-  const handleEmailMagicLogin = async (e: React.FormEvent) => {
+  const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!email.trim()) return
 
@@ -231,147 +166,16 @@ export function AuthModal({ user, syncStatus, lastSyncedAt, isOpen, onClose }: A
           /* CASE B: USER IS NOT LOGGED IN */
           /* ========================================================= */
           <div className="space-y-4">
-            {/* Mode Tabs */}
-            <div className="flex items-center rounded-2xl bg-surface-2 p-1 border border-line text-xs font-bold">
-              <button
-                type="button"
-                onClick={() => {
-                  setTab('signin')
-                  setMessage(null)
-                }}
-                className={`flex-1 py-1.5 rounded-xl transition-all flex items-center justify-center gap-1.5 ${
-                  tab === 'signin'
-                    ? 'bg-surface text-ink shadow-xs'
-                    : 'text-ink-3 hover:text-ink'
-                }`}
-              >
-                <LogIn size={13} />
-                <span>Sign In</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setTab('signup')
-                  setMessage(null)
-                }}
-                className={`flex-1 py-1.5 rounded-xl transition-all flex items-center justify-center gap-1.5 ${
-                  tab === 'signup'
-                    ? 'bg-surface text-ink shadow-xs'
-                    : 'text-ink-3 hover:text-ink'
-                }`}
-              >
-                <UserPlus size={13} />
-                <span>Sign Up</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setTab('magic')
-                  setMessage(null)
-                }}
-                className={`flex-1 py-1.5 rounded-xl transition-all flex items-center justify-center gap-1.5 ${
-                  tab === 'magic'
-                    ? 'bg-surface text-ink shadow-xs'
-                    : 'text-ink-3 hover:text-ink'
-                }`}
-              >
-                <Mail size={13} />
-                <span>Magic Link</span>
-              </button>
-            </div>
+            <p className="text-xs text-ink-2 leading-relaxed">
+              Sign in with your Google account or email to keep your habits safely 
+              backed up and synced seamlessly across all your devices.
+            </p>
 
-            {/* TAB 1 & 2: Email + Password (Instant, No Rate Limits) */}
-            {(tab === 'signin' || tab === 'signup') && (
-              <form onSubmit={handlePasswordAuth} className="space-y-2.5">
-                <div>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="name@gmail.com"
-                    required
-                    className="w-full h-10.5 rounded-2xl border border-line bg-surface-2 px-3.5 text-xs font-semibold text-ink placeholder:text-ink-3/60 focus:outline-hidden focus:border-accent"
-                  />
-                </div>
-
-                <div className="relative">
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder={tab === 'signup' ? 'Create password (min 6 chars)' : 'Password'}
-                    required
-                    minLength={tab === 'signup' ? 6 : 1}
-                    className="w-full h-10.5 rounded-2xl border border-line bg-surface-2 px-3.5 text-xs font-semibold text-ink placeholder:text-ink-3/60 focus:outline-hidden focus:border-accent"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={loading || !email.trim() || !password || !isSupabaseConfigured}
-                  className="btn btn-primary w-full justify-center !h-10 text-xs font-extrabold cursor-pointer"
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 size={14} className="animate-spin" />
-                      <span>{tab === 'signin' ? 'Signing in...' : 'Creating account...'}</span>
-                    </>
-                  ) : tab === 'signin' ? (
-                    <>
-                      <Lock size={14} /> <span>Sign In & Sync</span>
-                    </>
-                  ) : (
-                    <>
-                      <UserPlus size={14} /> <span>Create Account & Sync</span>
-                    </>
-                  )}
-                </button>
-              </form>
-            )}
-
-            {/* TAB 3: Magic Link Form */}
-            {tab === 'magic' && (
-              <form onSubmit={handleEmailMagicLogin} className="space-y-2.5">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@gmail.com"
-                  required
-                  className="w-full h-10.5 rounded-2xl border border-line bg-surface-2 px-3.5 text-xs font-semibold text-ink placeholder:text-ink-3/60 focus:outline-hidden focus:border-accent"
-                />
-
-                <button
-                  type="submit"
-                  disabled={loading || !email.trim() || !isSupabaseConfigured}
-                  className="btn btn-primary w-full justify-center !h-10 text-xs font-extrabold cursor-pointer"
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 size={14} className="animate-spin" /> <span>Sending link...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Mail size={14} /> <span>Send Magic Login Link</span>
-                    </>
-                  )}
-                </button>
-              </form>
-            )}
-
-            {/* Divider */}
-            <div className="relative flex items-center justify-center py-1">
-              <div className="w-full border-t border-line"></div>
-              <span className="absolute bg-surface px-3 text-[11px] font-bold text-ink-3 uppercase tracking-wider">
-                or
-              </span>
-            </div>
-
-            {/* Google Login Option */}
+            {/* 1. Google One-Click Login */}
             <button
               onClick={handleGoogleLogin}
               disabled={loading || !isSupabaseConfigured}
-              className="w-full h-10.5 rounded-2xl border border-line bg-surface hover:bg-surface-2 flex items-center justify-center gap-3 text-xs font-extrabold text-ink transition-all active:scale-[0.98] shadow-xs cursor-pointer"
+              className="w-full h-11 rounded-2xl border border-line bg-surface hover:bg-surface-2 flex items-center justify-center gap-3 text-xs font-extrabold text-ink transition-all active:scale-[0.98] shadow-xs cursor-pointer"
             >
               <svg className="size-4.5" viewBox="0 0 24 24">
                 <path
@@ -394,9 +198,47 @@ export function AuthModal({ user, syncStatus, lastSyncedAt, isOpen, onClose }: A
               <span>Continue with Google</span>
             </button>
 
-            <div className="pt-1 text-center text-[10.5px] text-ink-3 flex items-center justify-center gap-1.5 font-medium">
+            {/* Divider */}
+            <div className="relative flex items-center justify-center py-1">
+              <div className="w-full border-t border-line"></div>
+              <span className="absolute bg-surface px-3 text-[11px] font-bold text-ink-3 uppercase tracking-wider">
+                or email link
+              </span>
+            </div>
+
+            {/* 2. Email Magic Link Form */}
+            <form onSubmit={handleEmailLogin} className="space-y-2.5">
+              <div className="relative">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="name@gmail.com"
+                  required
+                  className="w-full h-10.5 rounded-2xl border border-line bg-surface-2 px-3.5 text-xs font-semibold text-ink placeholder:text-ink-3/60 focus:outline-hidden focus:border-accent"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading || !email.trim() || !isSupabaseConfigured}
+                className="btn btn-primary w-full justify-center !h-10 text-xs font-extrabold"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 size={14} className="animate-spin" /> <span>Sending link...</span>
+                  </>
+                ) : (
+                  <>
+                    <Mail size={14} /> <span>Send Magic Login Link</span>
+                  </>
+                )}
+              </button>
+            </form>
+
+            <div className="pt-2 text-center text-[10.5px] text-ink-3 flex items-center justify-center gap-1.5 font-medium">
               <Sparkles size={12} className="text-amber-500" />
-              <span>Real-time instant sync across phone and desktop</span>
+              <span>100% free & secure permanent cloud sync</span>
             </div>
           </div>
         )}
