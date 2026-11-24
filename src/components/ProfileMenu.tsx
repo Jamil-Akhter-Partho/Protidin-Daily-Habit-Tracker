@@ -209,7 +209,7 @@ export function ProfileMenu() {
     >
       {/* Liquid Glass Capsule */}
       <div
-        className={`group flex items-center gap-2 rounded-full px-2.5 py-1 transition-transform duration-150 ${
+        className={`profile-capsule group flex items-center gap-2 rounded-full px-2.5 py-1 transition-transform duration-150 ${
           isDragging ? 'cursor-grabbing scale-95' : 'cursor-grab hover:scale-[1.03]'
         }`}
         style={{

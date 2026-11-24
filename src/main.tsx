@@ -15,11 +15,25 @@ createRoot(document.getElementById('root')!).render(
   </StrictMode>,
 )
 
-// Register PWA Service Worker
+// Register PWA Service Worker with auto-update
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch((err) => {
-      console.log('SW registration note:', err)
-    })
+    navigator.serviceWorker
+      .register('./sw.js')
+      .then((reg) => {
+        reg.addEventListener('updatefound', () => {
+          const newWorker = reg.installing
+          if (newWorker) {
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                window.location.reload()
+              }
+            })
+          }
+        })
+      })
+      .catch((err) => {
+        console.log('SW registration note:', err)
+      })
   })
 }
