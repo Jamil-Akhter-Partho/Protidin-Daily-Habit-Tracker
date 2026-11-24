@@ -90,6 +90,22 @@ export async function signInWithGoogle() {
 }
 
 /**
+ * Sign in using Email + Password (instant, zero email rate limits)
+ */
+export async function signInWithPassword(email: string, password: string) {
+  if (!supabase) return { data: { user: null, session: null }, error: new Error('Supabase not configured') }
+  return supabase.auth.signInWithPassword({ email, password })
+}
+
+/**
+ * Sign up using Email + Password
+ */
+export async function signUpWithPassword(email: string, password: string) {
+  if (!supabase) return { data: { user: null, session: null }, error: new Error('Supabase not configured') }
+  return supabase.auth.signUp({ email, password })
+}
+
+/**
  * Sign in using Magic Link / OTP via Email (Requires 0 setup)
  */
 export async function signInWithEmailOtp(email: string) {
