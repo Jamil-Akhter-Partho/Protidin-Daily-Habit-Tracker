@@ -68,13 +68,34 @@ export function MobileHabitView({
   // View tabs: 'weekly' (default, 7-day bubbles) | 'today' (quick checklist) | 'overall' (5-row squircle heatmap)
   const [activeTab, setActiveTab] = useState<'weekly' | 'today' | 'overall'>('weekly')
 
-  // Left-to-Right Wave Scanner Trigger for Overall tab
-  const [waveKey, setWaveKey] = useState(0)
+  // Left-to-Right Wave Scanner Trigger for Overall tab (GPU-optimized, zero-remount)
+  const [isScanning, setIsScanning] = useState(false)
+
+  // Smoothly trigger wave scan after entering overall tab without delaying tab paint
   useEffect(() => {
     if (activeTab === 'overall') {
-      setWaveKey((k) => k + 1)
+      const t = setTimeout(() => setIsScanning(true), 120)
+      return () => clearTimeout(t)
+    } else {
+      setIsScanning(false)
     }
   }, [activeTab])
+
+  // Automatically turn off scanner after wave completes to release GPU
+  useEffect(() => {
+    if (!isScanning) return
+    const timer = setTimeout(() => setIsScanning(false), 1600)
+    return () => clearTimeout(timer)
+  }, [isScanning])
+
+  const triggerScan = () => {
+    setIsScanning(false)
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setIsScanning(true)
+      })
+    })
+  }
 
   // Find active week index matching today (if current month), else default to week 0
   const initialWeekIdx = useMemo(() => {
@@ -188,7 +209,9 @@ export function MobileHabitView({
         ? `${MONTHS[startM].slice(0, 3)} – ${MONTHS[endM].slice(0, 3)} ${endY}`
         : `${MONTHS[startM].slice(0, 3)} ${startY} – ${MONTHS[endM].slice(0, 3)} ${endY}`
 
-    return { days, monthGroups, rangeLabel }
+    const pastDaysCount = days.filter((d) => !d.isFuture).length
+
+    return { days, monthGroups, rangeLabel, pastDaysCount }
   }, [year, month, dim, today.y, today.m, today.d, today.key, isCurrentMonth])
 
   return (
@@ -356,7 +379,7 @@ export function MobileHabitView({
             </span>
           </div>
           <button
-            onClick={() => setWaveKey((k) => k + 1)}
+            onClick={triggerScan}
             className="flex items-center gap-1 rounded-lg bg-surface px-2.5 py-1 text-[11px] font-extrabold text-accent border border-line/80 hover:border-accent active:scale-95 transition-all shadow-2xs"
             title="Scan Left-to-Right wave"
           >
@@ -513,10 +536,12 @@ export function MobileHabitView({
 
                 {/* TAB 3: OVERALL (3-Month 13-Week Squircle Heatmap) */}
                 {activeTab === 'overall' && (() => {
-                  const doneCount = quarterlyData.days.filter(
-                    (d) => !d.isFuture && !!state.checks[ck(habit.id, d.key)]
-                  ).length
-                  const pastDays = quarterlyData.days.filter((d) => !d.isFuture).length
+                  let doneCount = 0
+                  for (let i = 0; i < quarterlyData.days.length; i++) {
+                    const d = quarterlyData.days[i]
+                    if (!d.isFuture && state.checks[ck(habit.id, d.key)]) doneCount++
+                  }
+                  const pastDays = quarterlyData.pastDaysCount
                   const pct = pastDays > 0 ? Math.round((doneCount / pastDays) * 100) : 0
 
                   return (
@@ -552,8 +577,8 @@ export function MobileHabitView({
                           ))}
                         </div>
 
-                        {/* 13 columns grouped by month with sleek vertical divider lines */}
-                        <div key={waveKey} className="flex items-center gap-1.5">
+                        {/* 13 columns grouped by month with sleek vertical divider lines (no key remount churn) */}
+                        <div className="flex items-center gap-1.5">
                           {quarterlyData.monthGroups.map((mg, groupIdx) => (
                             <div key={mg.monthIndex} className="flex items-center gap-1.5">
                               {/* Sleek Vertical Divider Line between months */}
@@ -576,7 +601,6 @@ export function MobileHabitView({
                               >
                                 {mg.days.map((d) => {
                                   const on = !d.isFuture && !!state.checks[ck(habit.id, d.key)]
-                                  const isWaveActive = waveKey > 0
 
                                   return (
                                     <button
@@ -589,7 +613,9 @@ export function MobileHabitView({
                                           ? 'ring-2 ring-accent ring-offset-1 ring-offset-surface'
                                           : ''
                                       } ${d.isFuture ? 'opacity-15 cursor-not-allowed' : 'cursor-pointer'} ${
-                                        isWaveActive
+                                        on ? '' : 'bg-line/75'
+                                      } ${
+                                        isScanning
                                           ? on
                                             ? 'wave-flash-done'
                                             : !d.isFuture
@@ -599,14 +625,10 @@ export function MobileHabitView({
                                       }`}
                                       style={{
                                         color: habitColor,
-                                        background: on
-                                          ? habitColor
-                                          : 'color-mix(in srgb, var(--line) 75%, transparent)',
-                                        boxShadow: on
-                                          ? `0 0 6px color-mix(in srgb, ${habitColor} 50%, transparent)`
-                                          : 'none',
+                                        background: on ? habitColor : undefined,
+                                        boxShadow: on ? `0 0 6px ${habitColor}80` : undefined,
                                         opacity: d.isFuture ? 0.15 : on ? 0.95 : 0.45,
-                                        animationDelay: isWaveActive
+                                        animationDelay: isScanning
                                           ? `${d.globalColIndex * 65}ms`
                                           : undefined,
                                       }}

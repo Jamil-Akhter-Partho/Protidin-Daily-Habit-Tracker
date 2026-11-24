@@ -14,7 +14,7 @@ import { ProfileMenu } from './components/ProfileMenu'
 import { InstallPopup } from './components/InstallPopup'
 import { AuthModal } from './components/AuthModal'
 import { MobileHabitView } from './components/MobileHabitView'
-import { useToday } from './lib/hooks'
+import { useIsDesktop, useToday } from './lib/hooks'
 import { BADGES, computeRewards, XP_PER_CHECK } from './lib/rewards'
 import { monthStats } from './lib/stats'
 import { useTheme } from './lib/theme'
@@ -35,6 +35,7 @@ export default function App() {
   const [burst, setBurst] = useState(0)
   const [floaters, setFloaters] = useState<Floater[]>([])
   const [forceDesktop, setForceDesktop] = useState(false)
+  const isDesktop = useIsDesktop()
   const seq = useRef(0)
   const theme = useTheme()
   const garden = theme.style === 'garden'
@@ -183,74 +184,76 @@ export default function App() {
       {/* DESKTOP & LAPTOP VIEW (screens >= 1024px, or forceDesktop)    */}
       {/* 100% UNTOUCHED, EXACTLY AS ORIGINALLY CRAFTED                 */}
       {/* ============================================================ */}
-      <div className={forceDesktop ? 'space-y-5' : 'hidden lg:block space-y-5'}>
-        {garden ? (
-          <GardenHero
-            key={`${view.y}-${view.m}`}
+      {(isDesktop || forceDesktop) && (
+        <div className={forceDesktop ? 'space-y-5' : 'hidden lg:block space-y-5'}>
+          {garden ? (
+            <GardenHero
+              key={`${view.y}-${view.m}`}
+              stats={stats}
+              state={state}
+              todayDone={todayDone}
+              isCurrentMonth={isCurrentMonth}
+              year={view.y}
+              month={view.m}
+              today={today}
+            />
+          ) : noor ? (
+            <NoorHero
+              key={`noor-${view.y}-${view.m}`}
+              activeTheme={activeTheme}
+              stats={stats}
+              state={state}
+              todayDone={todayDone}
+              isCurrentMonth={isCurrentMonth}
+              year={view.y}
+              month={view.m}
+              today={today}
+            />
+          ) : (
+            <StatCards stats={stats} todayDone={todayDone} habitCount={state.habits.length} />
+          )}
+
+          <HabitGrid
+            garden={garden}
+            noor={noor}
             stats={stats}
-            state={state}
-            todayDone={todayDone}
-            isCurrentMonth={isCurrentMonth}
+            checks={state.checks}
             year={view.y}
             month={view.m}
             today={today}
+            onToggle={handleToggle}
+            onEdit={(habit) => setModal({ kind: 'edit', habit })}
+            onMove={(id, dir) => dispatch({ type: 'move', id, dir })}
+            onAdd={() => setModal({ kind: 'new' })}
           />
-        ) : noor ? (
-          <NoorHero
-            key={`noor-${view.y}-${view.m}`}
-            activeTheme={activeTheme}
-            stats={stats}
-            state={state}
-            todayDone={todayDone}
-            isCurrentMonth={isCurrentMonth}
-            year={view.y}
-            month={view.m}
-            today={today}
-          />
-        ) : (
-          <StatCards stats={stats} todayDone={todayDone} habitCount={state.habits.length} />
-        )}
 
-        <HabitGrid
-          garden={garden}
-          noor={noor}
-          stats={stats}
-          checks={state.checks}
-          year={view.y}
-          month={view.m}
-          today={today}
-          onToggle={handleToggle}
-          onEdit={(habit) => setModal({ kind: 'edit', habit })}
-          onMove={(id, dir) => dispatch({ type: 'move', id, dir })}
-          onAdd={() => setModal({ kind: 'new' })}
-        />
-
-        {/* key: replay the chart entrance animation when the month changes */}
-        {garden ? (
-          <div className="grid gap-5 xl:grid-cols-3" key={`g-${view.y}-${view.m}`}>
-            <WeekdayFlower stats={stats} />
-            <WeeklyBlooms stats={stats} month={view.m} className="xl:col-span-2" />
-          </div>
-        ) : noor ? (
-          <div className="grid gap-5 xl:grid-cols-3" key={`n-${view.y}-${view.m}`}>
-            <MinaretChart stats={stats} />
-            <WeeklyHilals stats={stats} month={view.m} className="xl:col-span-2" />
-          </div>
-        ) : (
-          <>
-            <div className="grid gap-5 xl:grid-cols-3" key={`${view.y}-${view.m}`}>
-              <RhythmChart stats={stats} state={state} year={view.y} month={view.m} today={today} />
-              <WeekdayChart stats={stats} />
+          {/* key: replay the chart entrance animation when the month changes */}
+          {garden ? (
+            <div className="grid gap-5 xl:grid-cols-3" key={`g-${view.y}-${view.m}`}>
+              <WeekdayFlower stats={stats} />
+              <WeeklyBlooms stats={stats} month={view.m} className="xl:col-span-2" />
             </div>
-            <WeeklyDonuts stats={stats} month={view.m} />
-          </>
-        )}
-      </div>
+          ) : noor ? (
+            <div className="grid gap-5 xl:grid-cols-3" key={`n-${view.y}-${view.m}`}>
+              <MinaretChart stats={stats} />
+              <WeeklyHilals stats={stats} month={view.m} className="xl:col-span-2" />
+            </div>
+          ) : (
+            <>
+              <div className="grid gap-5 xl:grid-cols-3" key={`${view.y}-${view.m}`}>
+                <RhythmChart stats={stats} state={state} year={view.y} month={view.m} today={today} />
+                <WeekdayChart stats={stats} />
+              </div>
+              <WeeklyDonuts stats={stats} month={view.m} />
+            </>
+          )}
+        </div>
+      )}
 
       {/* ============================================================ */}
       {/* MOBILE & TABLET VIEW (screens < 1024px when not forceDesktop) */}
       {/* ============================================================ */}
-      {!forceDesktop && (
+      {!isDesktop && !forceDesktop && (
         <div className="block lg:hidden space-y-4">
           <MobileHabitView
             stats={stats}

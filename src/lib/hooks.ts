@@ -51,3 +51,22 @@ export function useCountUp(value: number, ms = 700): number {
   }, [value, ms])
   return Math.round(shown)
 }
+
+/** Returns true if viewport is >= 1024px (desktop layout breakpoint). */
+export function useIsDesktop(): boolean {
+  const [isDesktop, setIsDesktop] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth >= 1024 : true
+  )
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const media = window.matchMedia('(min-width: 1024px)')
+    const update = (e: MediaQueryListEvent | MediaQueryList) => setIsDesktop(e.matches)
+    update(media)
+    media.addEventListener('change', update)
+    return () => media.removeEventListener('change', update)
+  }, [])
+
+  return isDesktop
+}
+
