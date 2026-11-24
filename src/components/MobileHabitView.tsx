@@ -490,6 +490,7 @@ export function MobileHabitView({
                         const date = dateKey(year, month, d)
                         const isDayChecked = !!state.checks[ck(habit.id, date)]
                         const isDayToday = date === today.key
+                        const isFuture = date > today.key
                         const dayOfWeek = new Date(year, month, d).getDay()
                         const dayName = WEEKDAY_LETTERS[dayOfWeek]
 
@@ -497,21 +498,32 @@ export function MobileHabitView({
                           <div key={d} className="flex flex-col items-center gap-1">
                             <span
                               className={`text-[10px] font-bold ${
-                                isDayToday ? 'text-accent font-extrabold' : 'text-ink-3'
+                                isDayToday
+                                  ? 'text-accent font-extrabold'
+                                  : isFuture
+                                  ? 'text-ink-3/40'
+                                  : 'text-ink-3'
                               }`}
                             >
                               {dayName}
                             </span>
                             <button
+                              disabled={isFuture && !isDayChecked}
                               onClick={(e) => onToggle(habit.id, date, e.currentTarget)}
-                              className={`relative grid size-8 place-items-center rounded-full text-xs font-black transition-all active:scale-90 ${
+                              className={`relative grid size-8 place-items-center rounded-full text-xs font-black transition-all ${
                                 isDayChecked
-                                  ? 'bg-gradient-to-tr from-emerald-500 to-teal-400 text-black shadow-xs font-extrabold'
+                                  ? 'bg-gradient-to-tr from-emerald-500 to-teal-400 text-black shadow-xs font-extrabold active:scale-90'
                                   : isDayToday
-                                  ? 'border-2 border-accent bg-accent/15 text-accent font-bold'
-                                  : 'border border-line/80 bg-surface-2/80 text-ink-3 hover:border-ink-3'
+                                  ? 'border-2 border-accent bg-accent/15 text-accent font-bold active:scale-90'
+                                  : isFuture
+                                  ? 'border border-dashed border-line/70 bg-transparent text-ink-3/35 opacity-40 cursor-not-allowed select-none'
+                                  : 'border border-line/80 bg-surface-2/80 text-ink-3 hover:border-ink-3 active:scale-90'
                               }`}
-                              title={`${MONTHS[month]} ${d}`}
+                              title={
+                                isFuture
+                                  ? `${MONTHS[month]} ${d} (Locked)`
+                                  : `${MONTHS[month]} ${d}`
+                              }
                             >
                               {isDayChecked ? '✓' : <span className="text-[10px] opacity-75">{d}</span>}
                             </button>

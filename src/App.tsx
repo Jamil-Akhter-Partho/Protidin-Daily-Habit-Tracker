@@ -63,6 +63,8 @@ export default function App() {
     })
 
   const handleToggle = (id: string, date: string, el: HTMLElement) => {
+    const isCurrentlyChecked = !!state.checks[ck(id, date)]
+    if (date > today.key && !isCurrentlyChecked) return
     const action: Action = { type: 'toggle', id, date }
     const next = reducer(state, action)
     dispatch(action)
