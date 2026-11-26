@@ -76,7 +76,7 @@ export default function App() {
       { id: ++seq.current, x: rect.left + rect.width / 2, y: rect.top, text: `+${XP_PER_CHECK} XP` },
     ])
 
-    const before = computeRewards(state)
+    const before = rewards
     const after = computeRewards(next)
     const events: CelebrationEvent[] = []
 

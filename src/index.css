@@ -609,6 +609,14 @@ body {
 
 /* ---------- mobile performance safeguards (screens < 1024px) ---------- */
 @media (max-width: 1023px) {
+  /* 0. Smooth native touch scrolling & prevent fixed-background full-viewport repaints on mobile */
+  html {
+    scroll-behavior: auto;
+  }
+  body {
+    background-attachment: scroll !important;
+  }
+
   /* 1. Off-screen rewards optimization: skip rendering/animation when offscreen */
   #rewards {
     content-visibility: auto;

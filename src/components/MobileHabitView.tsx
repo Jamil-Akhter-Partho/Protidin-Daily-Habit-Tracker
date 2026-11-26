@@ -218,7 +218,7 @@ export function MobileHabitView({
     <div className="space-y-4">
       {/* 1. Mini Hero / Today Status Card */}
       <div
-        className="relative overflow-hidden rounded-3xl p-4.5 shadow-md border transition-all"
+        className="relative overflow-hidden rounded-3xl p-4.5 shadow-md border"
         style={{
           background: noor
             ? 'linear-gradient(135deg, rgba(6, 78, 59, 0.45) 0%, rgba(15, 23, 42, 0.85) 100%)'
@@ -308,7 +308,7 @@ export function MobileHabitView({
         <div className="grid grid-cols-3 gap-1">
           <button
             onClick={() => setActiveTab('weekly')}
-            className={`rounded-xl py-2 text-center text-[12.5px] font-extrabold transition-all ${
+            className={`rounded-xl py-2 text-center text-[12.5px] font-extrabold transition-transform ${
               activeTab === 'weekly'
                 ? 'bg-accent text-on-accent shadow-xs scale-[1.01]'
                 : 'text-ink-3 hover:text-ink'
@@ -318,7 +318,7 @@ export function MobileHabitView({
           </button>
           <button
             onClick={() => setActiveTab('today')}
-            className={`rounded-xl py-2 text-center text-[12.5px] font-extrabold transition-all ${
+            className={`rounded-xl py-2 text-center text-[12.5px] font-extrabold transition-transform ${
               activeTab === 'today'
                 ? 'bg-accent text-on-accent shadow-xs scale-[1.01]'
                 : 'text-ink-3 hover:text-ink'
@@ -328,7 +328,7 @@ export function MobileHabitView({
           </button>
           <button
             onClick={() => setActiveTab('overall')}
-            className={`rounded-xl py-2 text-center text-[12.5px] font-extrabold transition-all ${
+            className={`rounded-xl py-2 text-center text-[12.5px] font-extrabold transition-transform ${
               activeTab === 'overall'
                 ? 'bg-accent text-on-accent shadow-xs scale-[1.01]'
                 : 'text-ink-3 hover:text-ink'
@@ -380,7 +380,7 @@ export function MobileHabitView({
           </div>
           <button
             onClick={triggerScan}
-            className="flex items-center gap-1 rounded-lg bg-surface px-2.5 py-1 text-[11px] font-extrabold text-accent border border-line/80 hover:border-accent active:scale-95 transition-all shadow-2xs"
+            className="flex items-center gap-1 rounded-lg bg-surface px-2.5 py-1 text-[11px] font-extrabold text-accent border border-line/80 hover:border-accent active:scale-95 transition-transform shadow-2xs"
             title="Scan Left-to-Right wave"
           >
             <span>⚡</span>
@@ -408,7 +408,7 @@ export function MobileHabitView({
             return (
               <div
                 key={habit.id}
-                className="group relative overflow-hidden rounded-[22px] p-3.5 shadow-sm border transition-all"
+                className="group relative overflow-hidden rounded-[22px] p-3.5 shadow-sm border"
                 style={{
                   background: `color-mix(in srgb, ${habitColor} 8%, var(--surface))`,
                   borderColor: `color-mix(in srgb, ${habitColor} 24%, var(--line))`,
@@ -463,7 +463,7 @@ export function MobileHabitView({
                   ) : activeTab === 'today' ? (
                     <button
                       onClick={(e) => onToggle(habit.id, today.key, e.currentTarget)}
-                      className={`grid size-8 shrink-0 place-items-center rounded-xl text-sm font-black transition-all active:scale-90 ${
+                      className={`grid size-8 shrink-0 place-items-center rounded-xl text-sm font-black transition-transform active:scale-90 ${
                         isTodayChecked
                           ? 'bg-emerald-500 text-black shadow-md'
                           : 'border-2 border-line bg-surface-2 text-ink-3'
@@ -510,7 +510,7 @@ export function MobileHabitView({
                             <button
                               disabled={isFuture && !isDayChecked}
                               onClick={(e) => onToggle(habit.id, date, e.currentTarget)}
-                              className={`relative grid size-8 place-items-center rounded-full text-xs font-black transition-all ${
+                              className={`relative grid size-8 place-items-center rounded-full text-xs font-black transition-transform ${
                                 isDayChecked
                                   ? 'bg-gradient-to-tr from-emerald-500 to-teal-400 text-black shadow-xs font-extrabold active:scale-90'
                                   : isDayToday
